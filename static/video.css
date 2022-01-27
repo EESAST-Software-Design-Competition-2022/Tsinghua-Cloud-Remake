@@ -1,0 +1,7 @@
+.TCR-player .dplayer-comment-setting-type label {
+    width: 33%;
+}
+
+.TCR-player .dplayer-comment-setting-type label span {
+    width: 100% !important;
+}

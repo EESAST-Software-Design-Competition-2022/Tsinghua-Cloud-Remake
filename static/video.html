@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8/normalize.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.css">
+
+    <title>清华大学云盘 Remake!</title>
+    <link rel="icon" href="https://cloud.tsinghua.edu.cn/media/img/favicon.ico">
+</head>
+
+<body>
+    <header class="py-3 mb-4 border-bottom">
+        <div class="d-flex flex-wrap justify-content-center px-5">
+            <span class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
+                <span class="fs-4 me-5 d-none d-lg-inline">清华大学云盘 Remake!</span>
+                <span class="fs-4 me-5 TCR-title"></span>
+                <a class="TCR-download-button">
+                    <button class="btn btn-outline-dark">下载本文件</button>
+                </a>
+            </span>
+        </div>
+    </header>
+    <main>
+        <!-- <video class="ms-4 w-75" controls></video> -->
+        <div class="TCR-player ms-4 w-75"></div>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2/js/md5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dplayer@1/dist/DPlayer.min.js"></script>
+    <script class="init-temp">
+        /*
+         * Page initialization
+         */
+        (() => {
+            let cssNode = document.createElement('link');
+            cssNode.setAttribute('rel', 'stylesheet');
+            cssNode.setAttribute('href', TCR_config.staticURL + '/video.css');
+            document.querySelector('head').appendChild(cssNode);
+            let jsNode = document.createElement('script');
+            jsNode.setAttribute('src', TCR_config.staticURL + '/video.js');
+            document.querySelector('body').appendChild(jsNode);
+            document.querySelector('.init-temp').remove(); // Remove codes for initialization
+        })();
+    </script>
+</body>
+
+</html>
