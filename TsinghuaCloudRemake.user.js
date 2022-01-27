@@ -15,7 +15,7 @@
  * Configurations
  */
 window.TCR_config = {
-    staticURL: '',
+    staticURL: 'https://api.021121.xyz/TCR/static',
     backendURL: ''
 };
 
@@ -50,7 +50,6 @@ window.TCR_config = {
      */
     function remake() {
         console.log('Remake!');
-        console.log(TCR_config);
         document.querySelector('html').parentNode.removeChild(document.querySelector('html')); // To rewrite the whole page
         switch (shared.pageOptions.fileType) {
             case 'Video':
