@@ -6,6 +6,7 @@
 // @copyright    2021, Zijian Zhang (https://github.com/Futrime)
 // @license      MulanPSL-2.0
 // @match        *://cloud.tsinghua.edu.cn/f/*
+// @match        *://cloud.tsinghua.edu.cn/d/*/files/?p=*
 // @run-at       document-end
 
 // @icon         https://cloud.tsinghua.edu.cn/media/img/favicon.ico
@@ -50,14 +51,17 @@ window.TCR_config = {
      */
     function remake() {
         console.log('Remake!');
-        document.querySelector('html').parentNode.removeChild(document.querySelector('html')); // To rewrite the whole page
         switch (shared.pageOptions.fileType) {
             case 'Video':
                 console.log('Video mode.');
+                document.querySelector('html').parentNode.removeChild(document.querySelector('html')); // To rewrite the whole page
                 document.write(HTMLCache.video);
                 break;
 
             default:
+                console.log('Unsupported mode.');
+                remakeButton.setAttribute('disabled', '');
+                remakeButton.textContent = '此页面不支持Remake!';
                 break;
         }
     }
