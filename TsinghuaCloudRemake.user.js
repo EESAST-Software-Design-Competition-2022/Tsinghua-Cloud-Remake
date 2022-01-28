@@ -16,7 +16,7 @@
  */
 window.TCR_config = {
     staticURL: 'https://api.021121.xyz/TCR/static',
-    backendURL: ''
+    backendURL: 'https://api.021121.xyz/TCR/api'
 };
 
 (async () => {
