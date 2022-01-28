@@ -5,3 +5,17 @@
 .TCR-player .dplayer-comment-setting-type label span {
     width: 100% !important;
 }
+
+.TCR-history {
+    min-height: 75vh;
+}
+
+.TCR-history .card {
+    height: 100px;
+}
+
+.TCR-history .card img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
