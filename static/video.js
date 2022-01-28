@@ -9,7 +9,7 @@ const TCR_pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).
 
     document.querySelector('.TCR-download-button').setAttribute('href', shared.pageOptions.rawPath);
     document.querySelector('.TCR-download-button').setAttribute('download', shared.pageOptions.fileName);
-});
+})();
 
 
 /*
