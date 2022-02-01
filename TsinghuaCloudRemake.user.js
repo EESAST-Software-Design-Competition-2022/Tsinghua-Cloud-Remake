@@ -7,6 +7,9 @@
 // @license      MulanPSL-2.0
 // @match        *://cloud.tsinghua.edu.cn/f/*
 // @match        *://cloud.tsinghua.edu.cn/d/*/files/?p=*
+// @match        *://api.021121.xyz/TCR/dev/*
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @run-at       document-end
 
 // @icon         https://cloud.tsinghua.edu.cn/media/img/favicon.ico
@@ -15,8 +18,8 @@
 /*
  * Configurations
  */
-window.TCR_config = {
-    staticURL: 'https://api.021121.xyz/TCR/static',
+const TCR_config = {
+    staticURL: 'http://localhost:8080/static',
     backendURL: 'https://api.021121.xyz/TCR/api'
 };
 
@@ -45,12 +48,17 @@ window.TCR_config = {
 
     console.log('TsinghuaCloudRemake is loaded!');
 
+    if (GM_getValue('TCR_enabled', false)) {
+        remake();
+    }
+
 
     /*
      * Main function
      */
     function remake() {
         console.log('Remake!');
+        GM_setValue('TCR_enabled', true);
         switch (shared.pageOptions.fileType) {
             case 'Video':
                 console.log('Video mode.');
@@ -64,6 +72,19 @@ window.TCR_config = {
                 remakeButton.textContent = '此页面不支持Remake!';
                 break;
         }
+        const configNode = document.createElement('meta');
+        configNode.setAttribute('name', 'TCR-config');
+        configNode.setAttribute('config', JSON.stringify(TCR_config));
+        configNode.setAttribute('status', 'enabled');
+        configNode.addEventListener('click', (event) => {
+            const status = document.querySelector('meta[name="TCR-config"]').getAttribute('status');
+            if (status === 'enabled') {
+                GM_setValue('TCR_enabled', true);
+            } else if (status === 'disabled') {
+                GM_setValue('TCR_enabled', false);
+            }
+        });
+        document.querySelector('head').append(configNode);
     }
 
 })();

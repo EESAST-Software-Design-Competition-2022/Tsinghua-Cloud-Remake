@@ -1,3 +1,16 @@
+main {
+    width: 1280px;
+    max-width: 95%;
+}
+
+main > div {
+    width: 70%;
+}
+
+main > aside {
+    width: 30%;
+}
+
 .TCR-player .dplayer-comment-setting-type label {
     width: 33%;
 }
@@ -6,12 +19,17 @@
     width: 100% !important;
 }
 
+.TCR-player .dplayer-danmaku-item {
+    font-size: 3vh;
+    /* text-shadow: 3px 3px 1px black; */
+}
+
 .TCR-history {
     min-height: 75vh;
 }
 
 .TCR-history .card {
-    height: 100px;
+    height: 120px;
 }
 
 .TCR-history .card img {

@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8/normalize.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css">
 
     <title>清华大学云盘 Remake!</title>
     <link rel="icon" href="https://cloud.tsinghua.edu.cn/media/img/favicon.ico">
@@ -18,18 +19,19 @@
             <span class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
                 <span class="fs-4 me-5 d-none d-lg-inline">清华大学云盘 Remake!</span>
                 <span class="fs-4 me-5 TCR-title"></span>
+                <button class="btn btn-outline-dark m-1 TCR-disable">取消Remake!</button>
                 <a class="TCR-download-button">
                     <button class="btn btn-outline-dark">下载本文件</button>
                 </a>
             </span>
         </div>
     </header>
-    <main class="d-flex mt-4 mx-auto w-75">
-        <div class="me-4 w-75">
+    <main class="d-flex mt-4 mx-auto">
+        <div class="me-4">
             <div class="TCR-player w-100"></div>
             <div class="TCR-comments w-100 mt-5"></div>
         </div>
-        <aside class="w-25">
+        <aside>
             <div class="TCR-history w-100 mh-100 overflow-auto border p-1">
                 <div class="border-bottom py-1 px-2 fs-5 mb-2">历史记录</div>
                 <div class="card my-1 w-100" hidden>
@@ -41,7 +43,10 @@
                             <div class="col-8">
                                 <div class="card-body">
                                     <h6 class="card-title text-dark"></h6>
-                                    <p class="card-text"><small class="text-muted"></small></p>
+                                    <p class="card-text">
+                                        <small class="text-muted TCR-date bi-clock"></small><br>
+                                        <small class="text-muted TCR-sharer bi-person"></small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -58,16 +63,9 @@
     <script src="https://cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
     <script class="init-temp">
         /*
-         * Configurations
-         */
-        const TCR_config = {
-            staticURL: 'https://api.021121.xyz/TCR/static',
-            backendURL: 'https://api.021121.xyz/TCR/api'
-        };
-
-        /*
          * Page initialization
          */
+        const TCR_config = JSON.parse(document.querySelector('meta[name="TCR-config"]').getAttribute('config'));
         (() => {
             let cssNode = document.createElement('link');
             cssNode.setAttribute('rel', 'stylesheet');

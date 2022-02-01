@@ -22,8 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 $result = search_danmaku($id);
 $list = array();
 for ($i = 0; $i < count($result); $i++) {
-    $list[$i] = array($result[$i]['time'], $result[$i]['type'], $result[$i]['color'], $result[$i]['author'], $result[$i]['text']);
+    $list[$i] = array((float)$result[$i]['time'], (int)$result[$i]['type'], (int)$result[$i]['color'], $result[$i]['author'], $result[$i]['text']);
 }
 $data = array('code' => $code, 'data' => $list);
 $json = json_encode($data);
-exit($json);
+header('Content-Type: application/json');
+echo($json);
