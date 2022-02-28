@@ -19,7 +19,7 @@
  * Configurations
  */
 const TCR_config = {
-    staticURL: 'http://localhost:8080/static',
+    staticURL: 'https://api.021121.xyz/TCR/static',
     backendURL: 'https://api.021121.xyz/TCR/api'
 };
 
