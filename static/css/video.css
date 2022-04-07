@@ -1,3 +1,7 @@
+.tcr-logo {
+    height: 30px;
+}
+
 main {
     width: 1280px;
     max-width: 95%;
@@ -11,28 +15,31 @@ main > aside {
     width: 30%;
 }
 
-.TCR-player .dplayer-comment-setting-type label {
+.tcr-subtitle {
+    font-size: small;
+}
+
+.tcr-player .dplayer-comment-setting-type label {
     width: 33%;
 }
 
-.TCR-player .dplayer-comment-setting-type label span {
+.tcr-player .dplayer-comment-setting-type label span {
     width: 100% !important;
 }
 
-.TCR-player .dplayer-danmaku-item {
+.tcr-player .dplayer-danmaku-item {
     font-size: 3vh;
-    /* text-shadow: 3px 3px 1px black; */
 }
 
-.TCR-history {
+.tcr-history {
     min-height: 75vh;
 }
 
-.TCR-history .card {
+.tcr-history .card {
     height: 120px;
 }
 
-.TCR-history .card img {
+.tcr-history .card img {
     object-fit: cover;
     height: 100%;
     width: 100%;
