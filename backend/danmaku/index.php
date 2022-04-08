@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get all danmakus
     $result = getAllDanmaku($vid);
     $list = array();
     for ($i = 0; $i < count($result); $i++) {
-        $list[$i] = array('color' => $result[$i]['color'], 'text' => $result[$i]['text'], 'time' => (float)$result[$i]['time'], 'type' => $result[$i]['type'], 'metadata' => $result[$i]['metadata']);
+        $list[$i] = array('author' => $result[$i]['author'], 'color' => $result[$i]['color'], 'text' => $result[$i]['text'], 'time' => (float)$result[$i]['time'], 'type' => $result[$i]['type'], 'metadata' => $result[$i]['metadata']);
     }
     $json = json_encode($list);
     header('Access-Control-Allow-Origin: *');

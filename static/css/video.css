@@ -1,18 +1,27 @@
+header {
+    min-width: 960px;
+}
+
 .tcr-logo {
     height: 30px;
 }
 
+.tcr-avatar {
+    height: 30px;
+}
+
+.tcr-mylib-header,
+.tcr-mylib-header:hover {
+    color: white;
+}
+
 main {
-    width: 1280px;
-    max-width: 95%;
+    width: 1024px;
+    min-width: 960px;
 }
 
-main > div {
+main>div {
     width: 70%;
-}
-
-main > aside {
-    width: 30%;
 }
 
 .tcr-subtitle {
@@ -29,6 +38,23 @@ main > aside {
 
 .tcr-player .dplayer-danmaku-item {
     font-size: 3vh;
+}
+
+.tcr-comments .vinput {
+    color: black !important;
+}
+
+main>aside {
+    width: 30%;
+}
+
+.tcr-owner-avatar {
+    height: 60px;
+    width: 60px;
+}
+
+.tcr-danmaku-list small {
+    font-size: 13px;
 }
 
 .tcr-history {

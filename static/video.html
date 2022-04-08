@@ -13,26 +13,107 @@
 </head>
 
 <body>
-    <header class="py-0 border-bottom">
-        <div class="d-flex flex-wrap justify-content-center px-3 py-2">
-            <span class="d-flex align-items-center mb-0 me-auto text-dark text-decoration-none">
-                <a class="link-dark text-decoration-none" href="/"><img class="tcr-logo me-1 align-bottom">
-                <span class="fs-5">清华大学云盘 Remake</span></a>
+    <header class="py-2 border-bottom">
+        <div class="d-flex flex-wrap px-3 py-2">
+            <span class="d-flex align-items-center me-auto">
+                <a class="link-dark text-decoration-none mx-2" href="https://gitee.com/Futrime/tsinghua-cloud-remake"
+                    target="_blank">
+                    <img class="tcr-logo me-1 align-bottom">
+                    <span class="fs-5">清华大学云盘 Remake</span>
+                </a>
+            </span>
+            <span class="d-flex align-items-center mb-0 text-dark text-decoration-none">
+                <a target="_blank" href="/profile/" class="mx-2">
+                    <img class="tcr-avatar rounded-circle">
+                </a>
+                <a href="#" title="视频动态" class="bi-activity mx-2 fs-5 align-baseline link-dark tcr-activity-header"></a>
+                <a href="#" title="收藏夹" class="bi-star mx-2 fs-5 align-baseline link-dark tcr-collect-header"></a>
+                <a href="#" title="历史记录"
+                    class="bi-clock-history mx-2 fs-5 align-baseline link-dark tcr-history-header"></a>
+                <a href="https://learn.tsinghua.edu.cn/" target="_blank" title="网络学堂"
+                    class="bi-book mx-2 fs-5 align-baseline link-dark"></a>
+                <a href="/my-libs/" title="我的资料库" target="_blank"
+                    class="bi-hdd mx-3 px-2 py-1 fs-5 align-baseline bg-info rounded-3 tcr-mylib-header text-decoration-none"></a>
             </span>
         </div>
     </header>
     <main class="d-flex mt-4 mx-auto">
         <div class="me-4">
             <div class="mb-1 fs-5 tcr-title"></div>
-            <div class="mb-3 text-secondary tcr-subtitle"><span class="tcr-view-count"></span>播放 总弹幕数<span class="tcr-danmaku-count"></span></div>
+            <div class="mb-3 text-secondary tcr-subtitle"><span class="tcr-view-count"></span>播放 总弹幕数<span
+                    class="tcr-danmaku-count"></span></div>
             <div class="tcr-player w-100"></div>
-            <a class="tcr-download-button">
-                <button class="btn btn-outline-dark">下载本文件</button>
-            </a>
-            <div class="tcr-comments w-100 mt-5"></div>
+            <div class="tcr-toolbar mt-3">
+                <a href="#" title="点赞" class="tcr-like-button text-decoration-none link-dark me-5">
+                    <span class="bi-hand-thumbs-up-fill fs-3 me-2 align-middle"></span>
+                    <span class="align-middle">?</span>
+                </a>
+                <a href="#" title="收藏" class="tcr-collect-button text-decoration-none link-dark me-5">
+                    <span class="bi-star-fill fs-3 me-2 align-middle"></span>
+                    <span class="align-middle">?</span>
+                </a>
+                <a title="下载" class="tcr-download-button text-decoration-none link-dark me-5">
+                    <span class="bi-file-earmark-arrow-down-fill fs-3 me-2 align-middle"></span>
+                    <span class="align-middle">?</span>
+                </a>
+                <a href="#" title="公开此视频" class="tcr-share-button text-decoration-none link-dark me-5">
+                    <span class="bi-shift-fill fs-3 me-2 align-middle"></span>
+                    <span class="align-middle">公开状态未知</span>
+                </a>
+            </div>
+            <div class="tcr-comments w-100 mt-3"></div>
         </div>
         <aside>
-            <div class="tcr-history w-100 mh-100 overflow-auto border p-1">
+            <div class="tcr-owner-info w-100 overflow-auto p-3 mb-3 d-flex">
+                <img src="/media/avatars/default.png" class="rounded-circle tcr-owner-avatar">
+                <div class="ms-3 w-75">
+                    <div>
+                        <span class="me-2 tcr-owner-name"></span>
+                        <a href="mailto:" class="link-secondary text-decoration-none" hidden>
+                            <small class="bi-envelope"> 发消息</small>
+                        </a>
+                    </div>
+                    <button class="btn btn-info w-75 h-50 p-0 text-light mt-3 tcr-subsribe-button">
+                        <span class="bi-plus-lg me-2"></span>
+                        关注
+                        <span class="ms-1 tcr-subscribe-count"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="w-100 overflow-auto border p-1">
+                <div class="py-1 px-2 d-flex justify-content-between">
+                    <span>弹幕列表</span>
+                    <a class="text-decoration-none link-secondary bi-list" data-bs-toggle="collapse"
+                        href=".tcr-danmaku-list-collapse"></a>
+                </div>
+                <div class="border-top mt-2 w-100 overflow-auto collapse tcr-danmaku-list-collapse">
+                    <div class="d-grid w-100 tcr-danmaku-list">
+                        <div class="row w-100">
+                            <div class="col-3 pe-0">
+                                <small class="text-secondary">时间</small>
+                            </div>
+                            <div class="col-6 pe-0">
+                                <small class="text-secondary">弹幕内容</small>
+                            </div>
+                            <div class="col-3 pe-0">
+                                <small class="text-secondary">发送者</small>
+                            </div>
+                        </div>
+                        <div class="row w-100 tcr-danmaku-list-unit">
+                            <div class="col-3 pe-0 overflow-hidden">
+                                <small class="text-nowrap tcr-danmaku-list-unit-time"></small>
+                            </div>
+                            <div class="col-6 pe-0 overflow-hidden">
+                                <small class="text-nowrap tcr-danmaku-list-unit-text">弹幕装填中……</small>
+                            </div>
+                            <div class="col-3 pe-0 overflow-hidden">
+                                <small class="text-nowrap tcr-danmaku-list-unit-author"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tcr-history w-100 mh-100 overflow-auto border p-1 mt-2">
                 <div class="border-bottom py-1 px-2 fs-5 mb-2">历史记录</div>
                 <div class="card my-1 w-100" hidden>
                     <a class="text-decoration-none h-100 w-100">
@@ -76,7 +157,7 @@
             cssNode.setAttribute('rel', 'stylesheet');
             cssNode.setAttribute('href', config.staticURL + '/css/video.css');
             document.querySelector('head').append(cssNode);
-            
+
             let iconNode = document.createElement('link');
             iconNode.setAttribute('rel', 'icon');
             iconNode.setAttribute('href', config.staticURL + '/img/favicon.ico');

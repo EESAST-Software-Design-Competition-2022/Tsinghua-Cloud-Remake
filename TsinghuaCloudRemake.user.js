@@ -41,9 +41,7 @@ const config = {
     console.log('TsinghuaCloudRemake is loaded!');
 
     const pages = {
-        video: await fetch(config.staticURL + '/video.html', {
-            mode: 'cors'
-        }).then((res) => res.text())
+        video: await fetch(config.staticURL + '/video.html').then((res) => res.text())
     };
 
     document.querySelector('body').remove();

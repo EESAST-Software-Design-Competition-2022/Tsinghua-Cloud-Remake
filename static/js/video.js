@@ -16,9 +16,9 @@ const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUp
 const fileRealName = shared.pageOptions.fileName.replace('.' + shared.pageOptions.fileExt, '');
 document.querySelector('title').textContent = fileRealName + ' - 清华大学云盘 Remake'
 document.querySelector('.tcr-logo').setAttribute('src', config.staticURL + '/img/logo.png')
-document.querySelector('.tcr-title').textContent = fileRealName
-document.querySelector('.tcr-download-button').setAttribute('href', shared.pageOptions.rawPath);
-document.querySelector('.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
+document.querySelector('.tcr-title').textContent = fileRealName;
+
+document.querySelector('.tcr-avatar').setAttribute('src', app.config.avatarURL);
 
 /*
  * Player
@@ -42,22 +42,40 @@ const player = new window.NPlayer.Player({
         })
     ]
 });
+if (app.pageOptions.username === '') { // if not signed in, disable danmaku sending
+    player.updateControlItems(['play', 'time', 'spacer', 'danmaku-settings', 'airplay', 'volume', 'settings', 'web-fullscreen', 'fullscreen']);
+}
 player.mount('.tcr-player');
 
-// Load danmakus
 fetch(config.backendURL + '/danmaku/?vid=' + pageID)
     .then(res => res.json())
-    .then(res => player.danmaku.resetItems(res));
+    .then(res => {
+        player.danmaku.resetItems(res);
+        document.querySelector('.tcr-danmaku-count').textContent = res.length;
+        document.querySelector('.tcr-danmaku-list-unit').setAttribute('hidden', '');
+        res.sort((a, b) => (a.time - b.time));
+        for (const danmaku of res) {
+            const el = document.querySelector('.tcr-danmaku-list-unit').cloneNode(true);
+            el.querySelector('.tcr-danmaku-list-unit-time').textContent = `${Math.floor(danmaku.time / 60).toString().padStart(2, '0')}:${Math.floor(danmaku.time % 60).toString().padStart(2, '0')}`;
+            el.querySelector('.tcr-danmaku-list-unit-text').textContent = danmaku.text;
+            el.querySelector('.tcr-danmaku-list-unit-author').textContent = danmaku.author;
+            el.removeAttribute('hidden');
+            document.querySelector('.tcr-danmaku-list').append(el);
+        }
+    }); // Load danmakus
 
 // Listen on DanmakuSend event
 player.on('DanmakuSend', opts => {
     const requestBody = {
-        author: app.pageOptions.contactEmail,
+        author: app.pageOptions.name,
         color: opts.color,
         text: opts.text,
         time: opts.time,
         type: opts.type,
-        metadata: '{}'
+        metadata: JSON.stringify({
+            email: app.pageOptions.contactEmail,
+            send_time: (new Date()).getTime()
+        }, null, 0)
     };
     fetch(config.backendURL + '/danmaku/?vid=' + pageID, {
         method: 'POST',
@@ -66,13 +84,19 @@ player.on('DanmakuSend', opts => {
 });
 
 /*
- * Rendering comments
+ * Toolbar
+ */
+document.querySelector('.tcr-download-button').setAttribute('href', shared.pageOptions.rawPath);
+document.querySelector('.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
+
+/*
+ * Comments
  */
 const comments = new Valine({
     el: '.tcr-comments',
     appId: 'ocjPj9BOoMaS2kI9S29TiQC3-MdYXbMMI',
     appKey: 'QffyyBLYGUOWqHXFzyyv4WCo',
-    placeholder: '请写下你的评论',
+    placeholder: '发一条友善的评论',
     path: pageID,
     avatar: 'retro',
     meta: ['nick', 'mail'],
@@ -81,6 +105,10 @@ const comments = new Valine({
     serverURLs: 'https://ocjpj9bo.api.lncldglobal.com'
 });
 
+/*
+ * Owner info bar
+ */
+document.querySelector('.tcr-owner-name').textContent = shared.pageOptions.sharedBy;
 
 /*
  * History bar
