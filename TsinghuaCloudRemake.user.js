@@ -17,7 +17,6 @@
 // @license      MulanPSL-2.0
 // @match        *://cloud.tsinghua.edu.cn/f/*
 // @match        *://cloud.tsinghua.edu.cn/d/*/files/?p=*
-// @match        *://localhost:8000/*
 // @run-at       document-end
 
 // @icon         https://tsinghuacloudremake.api.021121.xyz/static/img/favicon.ico
