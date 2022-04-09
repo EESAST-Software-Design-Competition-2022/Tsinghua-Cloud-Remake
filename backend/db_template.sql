@@ -15,3 +15,15 @@ CREATE TABLE `tcr_danmaku` (
   `metadata` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tcr_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` char(26) NOT NULL UNIQUE,
+  `name` text NOT NULL,
+  `email` text NOT NULL,
+  `following` text NOT NULL,
+  `collection` text NOT NULL,
+  `avatar_url` text NOT NULL,
+  `metadata` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

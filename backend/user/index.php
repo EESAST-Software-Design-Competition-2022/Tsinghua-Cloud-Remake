@@ -19,31 +19,26 @@ function addDanmaku($vid, $data)
     $pdo->prepare($sql)->execute(array($vid, $data->author, $data->color, $data->text, $data->time, $data->type, $data->metadata));
 }
 
-function getAllDanmaku($vid)
+function getUser($username)
 {
     global $pdo;
-    $sql = "SELECT * FROM `tcr_danmaku` WHERE `vid`=? ";
+    $sql = "SELECT * FROM `tcr_user` WHERE `username`=? ";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(array($vid));
-    return $stmt->fetchAll();
+    $stmt->execute(array($username));
+    $list = $stmt->fetch();
+    if ($list == false) {
+        return false;
+    }
+    return array('username' => $list['username'], 'name' => $list['name'], 'email' => $list['email'], 'following' => $list['following'], 'collection' => $list['collection'], 'avatar_url' => $list['avatar_url'], 'metadata' => $list['metadata']);
 }
 
-$db_host = DB_HOST;
-$db_user = DB_USER;
-$db_pass = DB_PASS;
-$db_name = DB_NAME;
-$pdo_s = 'mysql:host=' . $db_host . ';' . 'dbname=' . $db_name;
-$pdo = new PDO($pdo_s, $db_user, $db_pass);
 
+$pdo = new PDO('mysql:host=' . DB_HOST . ';' . 'dbname=' . DB_NAME, DB_USER, DB_PASS);
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get all danmakus
-    $vid = $_GET['vid'];
-    $result = getAllDanmaku($vid);
-    $list = array();
-    for ($i = 0; $i < count($result); $i++) {
-        $list[$i] = array('author' => $result[$i]['author'], 'color' => $result[$i]['color'], 'text' => $result[$i]['text'], 'time' => (float)$result[$i]['time'], 'type' => $result[$i]['type'], 'metadata' => $result[$i]['metadata']);
-    }
-    $json = json_encode($list);
+    $username = $_GET['username'];
+    $result = getUser($username);
+    $json = json_encode($result);
     header('Content-Type: application/json');
     echo ($json);
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') { // add a danmaku

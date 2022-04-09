@@ -9,16 +9,26 @@
  */
 
 const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUpperCase(); // Unique ID for each file
+const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice(0, -shared.pageOptions.fileName.length)).toUpperCase(); // Unique ID for each folder
 
 /*
- * Title, icon and header
+ * Head, Icon and Header
  */
-const fileRealName = shared.pageOptions.fileName.replace('.' + shared.pageOptions.fileExt, '');
+const fileRealName = shared.pageOptions.fileName.slice(0, -(shared.pageOptions.fileExt.length + 1));
 document.querySelector('title').textContent = fileRealName + ' - 清华大学云盘 Remake'
-document.querySelector('.tcr-logo').setAttribute('src', config.staticURL + '/img/logo.png')
-document.querySelector('.tcr-title').textContent = fileRealName;
+document.querySelector('header .tcr-logo').setAttribute('src', config.staticURL + '/img/logo.png')
+document.querySelector('header .tcr-avatar').setAttribute('src', app.config.avatarURL);
 
-document.querySelector('.tcr-avatar').setAttribute('src', app.config.avatarURL);
+document.querySelector('header .tcr-history-button').addEventListener('click', () => {
+    const el = document.querySelector('.tcr-history');
+    const toast = new bootstrap.Toast(el);
+    toast.show();
+});
+
+/*
+ * Title and Subtitle
+ */
+document.querySelector('.tcr-title').textContent = fileRealName;
 
 /*
  * Player
@@ -51,16 +61,16 @@ fetch(config.backendURL + '/danmaku/?vid=' + pageID)
     .then(res => res.json())
     .then(res => {
         player.danmaku.resetItems(res);
-        document.querySelector('.tcr-danmaku-count').textContent = res.length;
-        document.querySelector('.tcr-danmaku-list-unit').setAttribute('hidden', '');
+        document.querySelector('.tcr-subtitle>.tcr-danmaku-count').textContent = res.length;
+        document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').setAttribute('hidden', '');
         res.sort((a, b) => (a.time - b.time));
         for (const danmaku of res) {
-            const el = document.querySelector('.tcr-danmaku-list-unit').cloneNode(true);
-            el.querySelector('.tcr-danmaku-list-unit-time').textContent = `${Math.floor(danmaku.time / 60).toString().padStart(2, '0')}:${Math.floor(danmaku.time % 60).toString().padStart(2, '0')}`;
-            el.querySelector('.tcr-danmaku-list-unit-text').textContent = danmaku.text;
-            el.querySelector('.tcr-danmaku-list-unit-author').textContent = danmaku.author;
+            const el = document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').cloneNode(true);
+            el.querySelector('.tcr-time').textContent = `${Math.floor(danmaku.time / 60).toString().padStart(2, '0')}:${Math.floor(danmaku.time % 60).toString().padStart(2, '0')}`;
+            el.querySelector('.tcr-text').textContent = danmaku.text;
+            el.querySelector('.tcr-author').textContent = danmaku.author;
             el.removeAttribute('hidden');
-            document.querySelector('.tcr-danmaku-list').append(el);
+            document.querySelector('.tcr-danmaku-list .tcr-list').append(el);
         }
     }); // Load danmakus
 
@@ -86,8 +96,8 @@ player.on('DanmakuSend', opts => {
 /*
  * Toolbar
  */
-document.querySelector('.tcr-download-button').setAttribute('href', shared.pageOptions.rawPath);
-document.querySelector('.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
+document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('href', shared.pageOptions.rawPath);
+document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
 
 /*
  * Comments
@@ -106,61 +116,62 @@ const comments = new Valine({
 });
 
 /*
- * Owner info bar
+ * Publisher Info
  */
-document.querySelector('.tcr-owner-name').textContent = shared.pageOptions.sharedBy;
+document.querySelector('.tcr-publisher-info .tcr-name').textContent = '未知用户';
 
 /*
- * History bar
+ * History
  */
 (() => {
-    // Capture and store screenshots for history bar
     document.querySelector('.tcr-player video').addEventListener('pause', (event) => {
         const video = document.querySelector('.tcr-player video');
         const canvas = document.createElement('canvas');
-        canvas.height = video.videoHeight / 16;
+        canvas.height = video.videoHeight / 16; // Resize to 1/16 to reduce the size of images
         canvas.width = video.videoWidth / 16;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataURL = canvas.toDataURL('image/jpeg');
-        localStorage.setItem('thumbnail:' + pageID, dataURL);
-    });
-    const history_bar = document.querySelector('.tcr-history');
+        localStorage.setItem('thumbnail:' + pageID, dataURL); // Store the image via StorageAPI
+    }); // Capture and store screenshots for history bar when paused
+
+    const historyListEl = document.querySelector('.tcr-history>.tcr-list');
     let metadata = JSON.parse(localStorage.getItem('history_metadata'));
     if (metadata === null) {
         metadata = [];
     }
-    const history_item_template = document.querySelector('.tcr-history .card[hidden]');
+    const history_item_template = document.querySelector('.tcr-history>.tcr-list>.tcr-unit');
     let metadata_clone = metadata.slice();
     for (const x of metadata_clone) {
         if (x.id === pageID) {
-            metadata.splice(metadata.indexOf(x), 1);
+            metadata.splice(metadata.indexOf(x), 1); // Remove metadata of current page
             continue;
         }
         const node = history_item_template.cloneNode(true);
-        history_bar.append(node);
         if (localStorage.getItem('thumbnail:' + x.id) !== null) {
             node.querySelector('img').setAttribute('src', localStorage.getItem('thumbnail:' + x.id));
         }
         node.querySelector('a').setAttribute('href', x.url);
         const title = (x.title.length <= 22) ? x.title : (x.title.substring(0, 20) + '……');
-        node.querySelector('.card-title').textContent = title;
+        node.querySelector('.tcr-name').textContent = title;
         const date_str = (new Date(x.timestamp)).toLocaleString('zh-CN', {
             dateStyle: "long",
             timeStyle: "short",
             hour12: false
         });
-        node.querySelector('.card-text .tcr-date').textContent = ' ' + date_str;
-        node.querySelector('.card-text .tcr-sharer').textContent = ' ' + x.sharer;
+        node.querySelector('.tcr-date').textContent = ' ' + date_str;
+        node.querySelector('.tcr-publisher').textContent = ' ' + x.sharer;
         node.removeAttribute('hidden');
+        historyListEl.append(node);
     }
     let current_meta = {
         id: pageID,
         url: location.href,
-        title: shared.pageOptions.fileName.replace('.' + shared.pageOptions.fileExt, ''),
+        title: shared.pageOptions.fileName.slice(0, -(shared.pageOptions.fileExt.length + 1)),
         timestamp: Date.now(),
         sharer: shared.pageOptions.sharedBy
     };
     metadata.unshift(current_meta);
+    metadata.sort((a, b) => (b.timestamp - a.timestamp));
     localStorage.setItem('history_metadata', JSON.stringify(metadata));
 })();

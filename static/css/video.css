@@ -1,26 +1,26 @@
-header {
-    min-width: 960px;
+body {
+    min-width: 992px;
 }
 
-.tcr-logo {
+header .tcr-logo {
     height: 30px;
 }
 
-.tcr-avatar {
+header .tcr-avatar {
     height: 30px;
 }
 
-.tcr-mylib-header,
-.tcr-mylib-header:hover {
+header .tcr-mylib-button,
+header .tcr-mylib-button:hover {
     color: white;
 }
 
 main {
-    width: 1024px;
-    min-width: 960px;
+    width: 1140px;
+    max-width: 90%;
 }
 
-main>div {
+article {
     width: 70%;
 }
 
@@ -28,44 +28,41 @@ main>div {
     font-size: small;
 }
 
-.tcr-player .dplayer-comment-setting-type label {
-    width: 33%;
-}
-
-.tcr-player .dplayer-comment-setting-type label span {
-    width: 100% !important;
-}
-
-.tcr-player .dplayer-danmaku-item {
-    font-size: 3vh;
-}
-
 .tcr-comments .vinput {
     color: black !important;
 }
 
-main>aside {
+aside {
     width: 30%;
 }
 
-.tcr-owner-avatar {
+.tcr-publisher-info>.tcr-avatar {
     height: 60px;
     width: 60px;
+}
+
+.tcr-danmaku-list .tcr-list {
+    max-height: 50vh;
 }
 
 .tcr-danmaku-list small {
     font-size: 13px;
 }
 
+.tcr-float-container {
+    z-index: 1;
+}
+
 .tcr-history {
     min-height: 75vh;
 }
 
-.tcr-history .card {
-    height: 120px;
+.tcr-history>.tcr-list>.tcr-unit {
+    height: 90px;
+    width: 90%;
 }
 
-.tcr-history .card img {
+.tcr-history>.tcr-list>.tcr-unit img {
     object-fit: cover;
     height: 100%;
     width: 100%;

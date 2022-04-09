@@ -24,114 +24,120 @@
             </span>
             <span class="d-flex align-items-center mb-0 text-dark text-decoration-none">
                 <a target="_blank" href="/profile/" class="mx-2">
-                    <img class="tcr-avatar rounded-circle">
+                    <img class="rounded-circle tcr-avatar">
                 </a>
-                <a href="#" title="视频动态" class="bi-activity mx-2 fs-5 align-baseline link-dark tcr-activity-header"></a>
-                <a href="#" title="收藏夹" class="bi-star mx-2 fs-5 align-baseline link-dark tcr-collect-header"></a>
+                <a href="#" title="视频动态" class="bi-activity mx-2 fs-5 align-baseline link-dark tcr-activity-button"></a>
+                <a href="#" title="收藏夹" class="bi-star mx-2 fs-5 align-baseline link-dark tcr-collection-button"></a>
                 <a href="#" title="历史记录"
-                    class="bi-clock-history mx-2 fs-5 align-baseline link-dark tcr-history-header"></a>
+                    class="bi-clock-history mx-2 fs-5 align-baseline link-dark tcr-history-button"></a>
                 <a href="https://learn.tsinghua.edu.cn/" target="_blank" title="网络学堂"
                     class="bi-book mx-2 fs-5 align-baseline link-dark"></a>
-                <a href="/my-libs/" title="我的资料库" target="_blank"
-                    class="bi-hdd mx-3 px-2 py-1 fs-5 align-baseline bg-info rounded-3 tcr-mylib-header text-decoration-none"></a>
+                <a href="/my-libs/" target="_blank" title="我的资料库" class="bi-hdd mx-2 fs-5 align-baseline link-dark"></a>
+                <a href="#"
+                    class="bi-upload mx-3 px-3 py-1 align-baseline bg-info rounded-3 text-decoration-none link-light tcr-publish-button"> 投稿</a>
             </span>
         </div>
     </header>
     <main class="d-flex mt-4 mx-auto">
-        <div class="me-4">
+        <article class="me-4">
             <div class="mb-1 fs-5 tcr-title"></div>
-            <div class="mb-3 text-secondary tcr-subtitle"><span class="tcr-view-count"></span>播放 总弹幕数<span
-                    class="tcr-danmaku-count"></span></div>
+            <div class="mb-3 text-secondary tcr-subtitle">
+                <span class="tcr-view-count"></span> 播放 总弹幕数 <span class="tcr-danmaku-count"></span> <span
+                    class="tcr-publish-time"></span>
+            </div>
             <div class="tcr-player w-100"></div>
             <div class="tcr-toolbar mt-3">
                 <a href="#" title="点赞" class="tcr-like-button text-decoration-none link-dark me-5">
                     <span class="bi-hand-thumbs-up-fill fs-3 me-2 align-middle"></span>
-                    <span class="align-middle">?</span>
+                    <span class="align-middle tcr-like-count">?</span>
                 </a>
                 <a href="#" title="收藏" class="tcr-collect-button text-decoration-none link-dark me-5">
                     <span class="bi-star-fill fs-3 me-2 align-middle"></span>
-                    <span class="align-middle">?</span>
+                    <span class="align-middle tcr-collect-count">?</span>
                 </a>
                 <a title="下载" class="tcr-download-button text-decoration-none link-dark me-5">
                     <span class="bi-file-earmark-arrow-down-fill fs-3 me-2 align-middle"></span>
-                    <span class="align-middle">?</span>
-                </a>
-                <a href="#" title="公开此视频" class="tcr-share-button text-decoration-none link-dark me-5">
-                    <span class="bi-shift-fill fs-3 me-2 align-middle"></span>
-                    <span class="align-middle">公开状态未知</span>
+                    <span class="align-middle tcr-download-count">?</span>
                 </a>
             </div>
             <div class="tcr-comments w-100 mt-3"></div>
-        </div>
+        </article>
         <aside>
-            <div class="tcr-owner-info w-100 overflow-auto p-3 mb-3 d-flex">
-                <img src="/media/avatars/default.png" class="rounded-circle tcr-owner-avatar">
+            <div class="w-100 overflow-auto p-3 mb-3 d-flex tcr-publisher-info">
+                <img src="https://cloud.tsinghua.edu.cn/media/avatars/default.png" class="rounded-circle tcr-avatar">
                 <div class="ms-3 w-75">
                     <div>
-                        <span class="me-2 tcr-owner-name"></span>
+                        <span class="me-2 tcr-name"></span>
                         <a href="mailto:" class="link-secondary text-decoration-none" hidden>
                             <small class="bi-envelope"> 发消息</small>
                         </a>
                     </div>
-                    <button class="btn btn-info w-75 h-50 p-0 text-light mt-3 tcr-subsribe-button">
+                    <button class="btn btn-outline-secondary w-75 h-50 p-0 text-secondary mt-3 tcr-subsribe-button"
+                        disabled>
                         <span class="bi-plus-lg me-2"></span>
                         关注
                         <span class="ms-1 tcr-subscribe-count"></span>
                     </button>
                 </div>
             </div>
-            <div class="w-100 overflow-auto border p-1">
+            <div class="w-100 overflow-auto border p-1 tcr-danmaku-list">
                 <div class="py-1 px-2 d-flex justify-content-between">
                     <span>弹幕列表</span>
                     <a class="text-decoration-none link-secondary bi-list" data-bs-toggle="collapse"
-                        href=".tcr-danmaku-list-collapse"></a>
+                        href="#tcr-danmaku-list-collapse"></a>
                 </div>
-                <div class="border-top mt-2 w-100 overflow-auto collapse tcr-danmaku-list-collapse">
-                    <div class="d-grid w-100 tcr-danmaku-list">
-                        <div class="row w-100">
-                            <div class="col-3 pe-0">
-                                <small class="text-secondary">时间</small>
-                            </div>
-                            <div class="col-6 pe-0">
-                                <small class="text-secondary">弹幕内容</small>
-                            </div>
-                            <div class="col-3 pe-0">
-                                <small class="text-secondary">发送者</small>
-                            </div>
+                <div class="border-top mt-2 px-2 w-100 overflow-hidden collapse" id="tcr-danmaku-list-collapse">
+                    <div class="row w-100">
+                        <div class="col-3 pe-0">
+                            <small class="text-secondary">时间</small>
                         </div>
-                        <div class="row w-100 tcr-danmaku-list-unit">
+                        <div class="col-6 pe-0">
+                            <small class="text-secondary">弹幕内容</small>
+                        </div>
+                        <div class="col-3 pe-0">
+                            <small class="text-secondary">发送者</small>
+                        </div>
+                    </div>
+                    <div class="d-grid w-100 overflow-auto vh-50 tcr-list">
+                        <div class="row w-100 tcr-unit">
                             <div class="col-3 pe-0 overflow-hidden">
-                                <small class="text-nowrap tcr-danmaku-list-unit-time"></small>
+                                <small class="text-nowrap tcr-time"></small>
                             </div>
                             <div class="col-6 pe-0 overflow-hidden">
-                                <small class="text-nowrap tcr-danmaku-list-unit-text">弹幕装填中……</small>
+                                <small class="text-nowrap tcr-text">弹幕装填中……</small>
                             </div>
                             <div class="col-3 pe-0 overflow-hidden">
-                                <small class="text-nowrap tcr-danmaku-list-unit-author"></small>
+                                <small class="text-nowrap tcr-author"></small>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="tcr-history w-100 mh-100 overflow-auto border p-1 mt-2">
-                <div class="border-bottom py-1 px-2 fs-5 mb-2">历史记录</div>
-                <div class="card my-1 w-100" hidden>
-                    <a class="text-decoration-none h-100 w-100">
-                        <div class="row g-0 h-100 w-100">
-                            <div class="col-4 h-100 p-1">
-                                <img class="rounded-3">
-                            </div>
-                            <div class="col-8">
-                                <div class="card-body">
-                                    <h6 class="card-title text-dark"></h6>
-                                    <p class="card-text">
-                                        <small class="text-muted tcr-date bi-clock"></small><br>
-                                        <small class="text-muted tcr-sharer bi-person"></small>
-                                    </p>
+            <div class="position-fixed top-0 end-0 p-3 tcr-float-container">
+                <div class="toast tcr-history">
+                    <div class="toast-header">
+                        <span class="bi-clock-history me-2"></span>
+                        <span class="me-auto">历史记录</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body overflow-auto tcr-list">
+                        <div class="my-1 mx-auto tcr-unit" hidden>
+                            <a class="text-decoration-none h-100 w-100">
+                                <div class="row h-100 w-100">
+                                    <div class="col-5 h-100 p-1">
+                                        <img class="rounded-3">
+                                    </div>
+                                    <div class="col-7 d-flex flex-column justify-content-center">
+                                        <div class="text-dark tcr-name"></div>
+                                        <div>
+                                            <small class="text-muted bi-clock tcr-date"></small><br>
+                                            <small class="text-muted bi-person tcr-publisher"></small>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                    </a>
+                    </div>
                 </div>
             </div>
         </aside>
