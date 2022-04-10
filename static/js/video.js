@@ -76,7 +76,7 @@ async function updateActivity() {
     }
 
     if (app.pageOptions.username !== '') {
-        fetch(config.backendURL + '/user/', {
+        await fetch(config.backendURL + '/user/', {
             method: 'POST',
             body: JSON.stringify({
                 action: 'updateUserInfo',
@@ -113,7 +113,18 @@ async function updateActivity() {
         document.querySelector('.tcr-toolbar .tcr-like-count').textContent = videoInfo['like_count'];
         document.querySelector('.tcr-toolbar .tcr-collect-count').textContent = videoInfo['collect_count'];
         document.querySelector('.tcr-toolbar .tcr-download-count').textContent = videoInfo['download_count'];
-        document.querySelector('.tcr-toolbar').removeAttribute('hidden');
+        if (userInfo !== false) {
+            document.querySelector('.tcr-toolbar .tcr-like-button').removeAttribute('hidden');
+            document.querySelector('.tcr-toolbar .tcr-collect-button').removeAttribute('hidden');
+            if (videoInfo['metadata']['like_list'].indexOf(userInfo['username']) !== -1) {
+                has_liked = true;
+                document.querySelector('.tcr-toolbar>.tcr-like-button').classList.replace('link-dark', 'link-info');
+            }
+            if (userInfo['collection'].indexOf(pageID) !== -1) {
+                has_collected = true;
+                document.querySelector('.tcr-toolbar>.tcr-collect-button').classList.replace('link-dark', 'link-info');
+            }
+        }
     }
 
     // Update publisher information
@@ -253,11 +264,115 @@ player.on('DanmakuSend', opts => {
     });
 });
 
+// Listen on Play event
+let has_played = false;
+player.on('Play', () => {
+    if (!has_played) {
+        has_played = true;
+        fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'visit',
+                username: "", // not required
+                fid: pageID,
+                type: true
+            }, null, 0)
+        })
+    }
+});
+
 /*
  * Toolbar
  */
+// Like button
+let has_liked = false;
+document.querySelector('.tcr-toolbar>.tcr-like-button').addEventListener('click', async () => {
+    document.querySelector('.tcr-toolbar>.tcr-like-button').setAttribute('disabled', '');
+    if (userInfo === false) {
+        return;
+    }
+    if (!has_liked) {
+        has_liked = true;
+        document.querySelector('.tcr-toolbar>.tcr-like-button').classList.replace('link-dark', 'link-info');
+        videoInfo['like_count'] += 1;
+        await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'like',
+                username: userInfo['username'],
+                fid: pageID,
+                type: true
+            }, null, 0)
+        });
+    } else {
+        has_liked = false;
+        document.querySelector('.tcr-toolbar>.tcr-like-button').classList.replace('link-info', 'link-dark');
+        videoInfo['like_count'] -= 1;
+        await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'like',
+                username: userInfo['username'],
+                fid: pageID,
+                type: false
+            }, null, 0)
+        });
+    }
+    document.querySelector('.tcr-toolbar>.tcr-like-button>.tcr-like-count').textContent = videoInfo['like_count'];
+    document.querySelector('.tcr-toolbar>.tcr-like-button').removeAttribute('disabled');
+});
+
+// Collect button
+let has_collected = false;
+document.querySelector('.tcr-toolbar>.tcr-collect-button').addEventListener('click', async () => {
+    document.querySelector('.tcr-toolbar>.tcr-collect-button').setAttribute('disabled', '');
+    if (userInfo === false) {
+        return;
+    }
+    if (!has_collected) {
+        has_collected = true;
+        document.querySelector('.tcr-toolbar>.tcr-collect-button').classList.replace('link-dark', 'link-info');
+        videoInfo['collect_count'] += 1;
+        await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'collect',
+                username: userInfo['username'],
+                fid: pageID,
+                type: true
+            }, null, 0)
+        });
+    } else {
+        has_collected = false;
+        document.querySelector('.tcr-toolbar>.tcr-collect-button').classList.replace('link-info', 'link-dark');
+        videoInfo['collect_count'] -= 1;
+        await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'collect',
+                username: userInfo['username'],
+                fid: pageID,
+                type: false
+            }, null, 0)
+        });
+    }
+    document.querySelector('.tcr-toolbar>.tcr-collect-button>.tcr-collect-count').textContent = videoInfo['collect_count'];
+    document.querySelector('.tcr-toolbar>.tcr-collect-button').removeAttribute('disabled');
+});
+
 document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('href', shared.pageOptions.rawPath);
 document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
+document.querySelector('.tcr-toolbar>.tcr-download-button').addEventListener('click', () => {
+    fetch(config.backendURL + '/library/', {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'download',
+            username: "", // not required
+            fid: pageID,
+            type: true
+        }, null, 0)
+    })
+});
 
 /*
  * Publisher Information

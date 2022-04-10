@@ -12,17 +12,6 @@
 
 require "../config.php";
 
-function shareFile($data)
-{
-    global $pdo;
-    if (!isset($data->poster)) {
-        $data->poster = '';
-    }
-    $sql = "INSERT INTO `tcr_library` (`fid`, `pid`, `publisher`, `time`, `type`, `tag`, `brief`, `url`, `poster`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $pdo->prepare($sql)->execute(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->url, $data->poster, json_encode($data->metadata)));
-    print_r(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->url, $data->poster, json_encode($data->metadata)));
-}
-
 function getFileInfo($query)
 {
     global $pdo;
@@ -50,7 +39,7 @@ function getFileInfo($query)
     $stmt->execute($query_array);
     $list = $stmt->fetchAll();
     if ($list == false) {
-        return false;
+        return array();
     }
     $result = array();
     for ($i = 0; $i < count($list); $i++) {
@@ -74,6 +63,76 @@ function getFileInfo($query)
     return $result;
 }
 
+function shareFile($data)
+{
+    global $pdo;
+    if (!isset($data->poster)) {
+        $data->poster = '';
+    }
+    $sql = "INSERT INTO `tcr_library` (`fid`, `pid`, `publisher`, `time`, `type`, `tag`, `brief`, `url`, `poster`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $pdo->prepare($sql)->execute(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->url, $data->poster, json_encode($data->metadata)));
+}
+
+function performAction($data)
+{
+    global $pdo;
+    if ($data->action == 'visit') {
+        $pdo->prepare("UPDATE `tcr_library` SET `visit_count`=`visit_count` + 1 WHERE `fid`=? ;")
+            ->execute(array($data->fid));
+    } else if ($data->action == 'like') {
+        $stmt = $pdo->prepare("SELECT * FROM `tcr_library` WHERE `fid`=? ");
+        $stmt->execute(array($data->fid));
+        $item = $stmt->fetch();
+        if ($item == false) {
+            return;
+        }
+        $metadata = (array)json_decode($item['metadata']);
+        if (!isset($metadata['like_list'])) {
+            $metadata['like_list'] = array();
+        }
+        if ($data->type == true) { // perform like
+            $metadata['like_list'][] = $data->username;
+            $metadata['like_list'] = array_unique($metadata['like_list']);
+            $metadata['like_list'] = array_values($metadata['like_list']);
+            $pdo->prepare("UPDATE `tcr_library` SET `like_count`=?, `metadata`=? WHERE `fid`=? ;")
+                ->execute(array(count($metadata['like_list']), json_encode($metadata), $data->fid));
+        } else { // withdraw like
+            if (array_search($data->username, $metadata['like_list']) === false) {
+                return;
+            }
+            array_splice($metadata['like_list'], array_search($data->username, $metadata['like_list']), 1);
+            $pdo->prepare("UPDATE `tcr_library` SET `like_count`=?, `metadata`=? WHERE `fid`=? ;")
+                ->execute(array(count($metadata['like_list']), json_encode($metadata), $data->fid));
+        }
+    } else if ($data->action == 'collect') {
+        $stmt = $pdo->prepare("SELECT * FROM `tcr_user` WHERE `username`=? ");
+        $stmt->execute(array($data->username));
+        $item = $stmt->fetch();
+        if ($item == false) {
+            return;
+        }
+        $collection = json_decode($item['collection']);
+
+        if ($data->type == true) {
+            $collection[] = $data->fid;
+            $collection = array_unique($collection);
+            $collection = array_values($collection);
+            $pdo->prepare("UPDATE `tcr_user` SET `collection`=? WHERE `username`=? ; UPDATE `tcr_library` SET `collect_count`=? WHERE `fid`=? ;")
+                ->execute(array(json_encode($collection), $data->username, count($collection), $data->fid));
+        } else {
+            if (array_search($data->fid, $collection) === false) {
+                return;
+            }
+            array_splice($collection, array_search($data->fid, $collection), 1);
+            $pdo->prepare("UPDATE `tcr_user` SET `collection`=? WHERE `username`=? ; UPDATE `tcr_library` SET `collect_count`=? WHERE `fid`=? ;")
+                ->execute(array(json_encode($collection), $data->username, count($collection), $data->fid));
+        }
+    } else if ($data->action == 'download') {
+        $pdo->prepare("UPDATE `tcr_library` SET `download_count`=`download_count` + 1 WHERE `fid`=? ;")
+            ->execute(array($data->fid));
+    }
+}
+
 
 $pdo = new PDO('mysql:host=' . DB_HOST . ';' . 'dbname=' . DB_NAME, DB_USER, DB_PASS);
 
@@ -86,4 +145,9 @@ if ($data->action == 'getFileInfo') {
     echo ($json);
 } else if ($data->action == 'shareFile') {
     shareFile($data);
+} else if (
+    $data->action == 'visit' || $data->action == 'like' ||
+    $data->action == 'collect' || $data->action == 'download'
+) {
+    performAction($data);
 }
