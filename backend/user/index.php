@@ -52,7 +52,6 @@ function followUser($data)
     $stmt->execute(array($data->username));
     $follower = $stmt->fetch();
     $follower['following'] = json_decode($follower['following']);
-    print_r($data);
     if ($data->type == 'follow') {
         $follower['following'][] = $data->follow;
         $pdo->prepare("UPDATE `tcr_user` SET `following`=? WHERE `username`=? ; UPDATE `tcr_user` SET `followed_count`=`followed_count` + 1 WHERE `username`=? ;")

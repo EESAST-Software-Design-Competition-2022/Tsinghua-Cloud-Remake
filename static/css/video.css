@@ -86,6 +86,26 @@ aside {
     max-height: 200px;
 }
 
+.tcr-collection {
+    min-height: 75vh;
+}
+
+.tcr-collection>.tcr-list>.tcr-unit {
+    width: 90%;
+}
+
+.tcr-collection>.tcr-list>.tcr-unit img {
+    height: 30px;
+}
+
+.tcr-collection>.tcr-list>.tcr-unit small {
+    font-size: small;
+}
+
+.tcr-collection>.tcr-list>.tcr-unit .tcr-name{
+    max-height: 200px;
+}
+
 .tcr-history {
     min-height: 75vh;
 }

@@ -57,6 +57,57 @@ async function updateActivity() {
     }
 };
 
+/**
+ * Update collection menu
+ */
+async function updateCollection() {
+    // Get videos in collection
+    let collectionVideos = [];
+    for (const x of userInfo['collection']) {
+        let videos = await (await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'getFileInfo',
+                fid: x,
+                type: 'video'
+            }, null, 0)
+        })).json();
+        if (videos == false) { // if this video does not exist (abnormal)
+            continue;
+        }
+        collectionVideos.push(videos[0]);
+    }
+    collectionVideos = collectionVideos.reverse();
+
+    // Get publishers' information
+    let publisherList = [];
+    let publisherInfoList = [];
+    for (const x of collectionVideos) {
+        publisherList.push(x['publisher']);
+    }
+    publisherList = Array.from(new Set(publisherList)); // remove duplicated items to reduce time consumption
+    for (const x of publisherList) {
+        let info = await (await fetch(config.backendURL + '/user/?username=' + x)).json();
+        publisherInfoList[x] = info;
+    }
+
+    // Display collection
+    const template = document.querySelector('.tcr-collection>.tcr-list>.tcr-unit');
+    for (let i = 0; i < collectionVideos.length; i++) {
+        const x = collectionVideos[i];
+        const el = template.cloneNode(true);
+        el.querySelector('img').setAttribute('src', publisherInfoList[x['publisher']]['avatar_url']);
+        el.querySelector('.tcr-publisher').textContent = publisherInfoList[x['publisher']]['name'];
+        el.querySelector('.tcr-name').textContent = x['brief'];
+        el.querySelector('a').setAttribute('href', x['url']);
+        if (i !== 0) {
+            el.classList.add('border-top');
+        }
+        el.removeAttribute('hidden');
+        document.querySelector('.tcr-collection>.tcr-list').append(el);
+    }
+};
+
 /*
  * Initialization
  */
@@ -157,7 +208,17 @@ async function updateActivity() {
     if (userInfo !== false) {
         updateActivity();
     }
+
+    // Update collection asynchronously
+    if (userInfo !== false) {
+        updateCollection();
+    }
 })();
+
+
+
+
+
 
 /*
  * Head, Icon and Header
@@ -171,13 +232,19 @@ document.querySelector('header .tcr-activity-button').addEventListener('click', 
     const el = document.querySelector('.tcr-activity');
     const toast = new bootstrap.Toast(el);
     toast.show();
-}); // Show activity menu
+}); // show activity menu
+
+document.querySelector('header .tcr-collection-button').addEventListener('click', () => {
+    const el = document.querySelector('.tcr-collection');
+    const toast = new bootstrap.Toast(el);
+    toast.show();
+}); // show collection menu
 
 document.querySelector('header .tcr-history-button').addEventListener('click', () => {
     const el = document.querySelector('.tcr-history');
     const toast = new bootstrap.Toast(el);
     toast.show();
-}); // Show history menu
+}); // show history menu
 
 document.querySelector('header .tcr-publish-button').addEventListener('click', async () => {
     const spinner = document.createElement('span');
