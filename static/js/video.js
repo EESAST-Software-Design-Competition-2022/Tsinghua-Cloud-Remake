@@ -10,9 +10,9 @@
 
 const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUpperCase(); // Unique ID for each file
 const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice(0, -shared.pageOptions.fileName.length)).toUpperCase(); // Unique ID for each folder
-let videoInfo = {};
-let userInfo = {};
-let publisherInfo = {};
+let videoInfo = false;
+let userInfo = false;
+let publisherInfo = false;
 
 /**
  * Update activity menu
@@ -113,11 +113,13 @@ async function updateActivity() {
     document.querySelector('.tcr-publisher-info .tcr-email-button').setAttribute('href', 'mailto:' + publisherInfo.email);
     document.querySelector('.tcr-publisher-info .tcr-email-button').removeAttribute('hidden');
 
-    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-disabled').setAttribute('hidden', '');
-    if (userInfo['following'].indexOf(publisherInfo['username']) === -1) { // if not subscribed
-        document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
-    } else {
-        document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+    if (userInfo !== false) {
+        document.querySelector('.tcr-publisher-info .tcr-subscribe-button-disabled').setAttribute('hidden', '');
+        if (userInfo['following'].indexOf(publisherInfo['username']) === -1) { // if not subscribed
+            document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
+        } else {
+            document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+        }
     }
 
     for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
@@ -125,7 +127,9 @@ async function updateActivity() {
     }
 
     // Update activity asynchronously
-    updateActivity();
+    if (userInfo !== false) {
+        updateActivity();
+    }
 })();
 
 /*
@@ -425,12 +429,16 @@ const comments = new Valine({
         node.removeAttribute('hidden');
         historyListEl.append(node);
     }
+    let sharer = shared.pageOptions.sharedBy;
+    if (videoInfo !== false) {
+        sharer = videoInfo['publisher'];
+    }
     let current_meta = {
         id: pageID,
         url: location.href,
         title: shared.pageOptions.fileName.slice(0, -(shared.pageOptions.fileExt.length + 1)),
         timestamp: Date.now(),
-        sharer: shared.pageOptions.sharedBy
+        sharer: sharer
     };
     metadata.unshift(current_meta);
     metadata.sort((a, b) => (b.timestamp - a.timestamp));
