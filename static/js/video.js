@@ -272,7 +272,9 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
                 tag: [],
                 brief: fileRealName,
                 url: location.origin + location.pathname,
-                metadata: {}
+                metadata: {
+                    like_list: []
+                }
             }, null, 0)
         })
     }

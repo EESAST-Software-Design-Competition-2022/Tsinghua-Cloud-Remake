@@ -39,7 +39,7 @@ function getFileInfo($query)
     $stmt->execute($query_array);
     $list = $stmt->fetchAll();
     if ($list == false) {
-        return array();
+        return false;
     }
     $result = array();
     for ($i = 0; $i < count($list); $i++) {
