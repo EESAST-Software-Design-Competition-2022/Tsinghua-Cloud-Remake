@@ -62,7 +62,7 @@ async function updateActivity() {
  */
 (async () => {
     // Load information
-    videoInfo = await (await fetch(config.backendURL + '/library/', {
+    let tmp_videoInfo = await (await fetch(config.backendURL + '/library/', {
         method: 'POST',
         body: JSON.stringify({
             action: 'getFileInfo',
@@ -71,12 +71,9 @@ async function updateActivity() {
         }, null, 0)
     })).json();
 
-    if (videoInfo === false) { // if the video is not recorded in remote library
-        document.querySelector('header .tcr-publish-button').removeAttribute('hidden');
-        document.querySelector('.tcr-publisher-info .tcr-name').textContent = shared.pageOptions.sharedBy + '（资料库）';
-        return;
+    if (tmp_videoInfo !== false) {
+        videoInfo = tmp_videoInfo[0]; // Only need information of current video
     }
-    videoInfo = videoInfo[0]; // Only need information of current video
 
     if (app.pageOptions.username !== '') {
         fetch(config.backendURL + '/user/', {
@@ -92,38 +89,57 @@ async function updateActivity() {
         userInfo = await (await fetch(config.backendURL + '/user/?username=' + app.pageOptions.username)).json();
     }
 
-    publisherInfo = await (await fetch(config.backendURL + '/user/?username=' + videoInfo.publisher)).json();
+    if (videoInfo !== false) {
+        publisherInfo = await (await fetch(config.backendURL + '/user/?username=' + videoInfo['publisher'])).json();
+    }
 
-    // Update subtitle
-    document.querySelector('.tcr-subtitle>.tcr-view-count').textContent = videoInfo['visit_count'];
-    document.querySelector('.tcr-subtitle>.tcr-publish-time').textContent = (new Date(videoInfo['time'] * 1000)).toLocaleString('zh-CN');
-
-    // Update toolbar
-    document.querySelector('.tcr-toolbar').removeAttribute('hidden');
-    document.querySelector('.tcr-toolbar .tcr-like-count').textContent = videoInfo['like_count'];
-    document.querySelector('.tcr-toolbar .tcr-collect-count').textContent = videoInfo['collect_count'];
-    document.querySelector('.tcr-toolbar .tcr-download-count').textContent = videoInfo['download_count'];
-
-    // Update publisher information
-    document.querySelector('.tcr-publisher-info>.tcr-avatar').setAttribute('src', publisherInfo['avatar_url']);
-
-    document.querySelector('.tcr-publisher-info .tcr-name').textContent = publisherInfo['name'];
-    document.querySelector('.tcr-publisher-info .tcr-name').classList.replace('link-secondary', 'link-primary');
-
-    document.querySelector('.tcr-publisher-info .tcr-email-button').setAttribute('href', 'mailto:' + publisherInfo.email);
-    document.querySelector('.tcr-publisher-info .tcr-email-button').removeAttribute('hidden');
-
-    if (userInfo !== false) {
-        document.querySelector('.tcr-publisher-info .tcr-subscribe-button-disabled').setAttribute('hidden', '');
-        if (userInfo['following'].indexOf(publisherInfo['username']) === -1) { // if not subscribed
-            document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
-        } else {
-            document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+    // Update header
+    if (userInfo !== false) { // if user has signed in
+        document.querySelector('header .tcr-activity-button').removeAttribute('hidden');
+        document.querySelector('header .tcr-collection-button').removeAttribute('hidden');
+        if (videoInfo === false) { // if the video hasn't been published
+            document.querySelector('header .tcr-publish-button').removeAttribute('hidden'); // Allow publishing
         }
     }
 
-    for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
-        x.textContent = publisherInfo['followed_count'];
+    // Update subtitle
+    if (videoInfo !== false) {
+        document.querySelector('.tcr-subtitle>.tcr-view-count').textContent = videoInfo['visit_count'];
+        document.querySelector('.tcr-subtitle>.tcr-publish-time').textContent = (new Date(videoInfo['time'] * 1000)).toLocaleString('zh-CN');
+    }
+
+    // Update toolbar
+    if (videoInfo !== false) {
+        document.querySelector('.tcr-toolbar .tcr-like-count').textContent = videoInfo['like_count'];
+        document.querySelector('.tcr-toolbar .tcr-collect-count').textContent = videoInfo['collect_count'];
+        document.querySelector('.tcr-toolbar .tcr-download-count').textContent = videoInfo['download_count'];
+        document.querySelector('.tcr-toolbar').removeAttribute('hidden');
+    }
+
+    // Update publisher information
+    if (videoInfo === false) {
+        document.querySelector('.tcr-publisher-info .tcr-name').textContent = shared.pageOptions.sharedBy + '（资料库）'; // Display repo sharer
+    } else {
+        document.querySelector('.tcr-publisher-info>.tcr-avatar').setAttribute('src', publisherInfo['avatar_url']);
+
+        document.querySelector('.tcr-publisher-info .tcr-name').textContent = publisherInfo['name'];
+        document.querySelector('.tcr-publisher-info .tcr-name').classList.replace('link-secondary', 'link-primary');
+
+        document.querySelector('.tcr-publisher-info .tcr-email-button').setAttribute('href', 'mailto:' + publisherInfo.email);
+        document.querySelector('.tcr-publisher-info .tcr-email-button').removeAttribute('hidden');
+
+        for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
+            x.textContent = publisherInfo['followed_count'];
+        }
+
+        if (userInfo !== false) { // if user has signed in
+            document.querySelector('.tcr-publisher-info .tcr-subscribe-button-disabled').setAttribute('hidden', '');
+            if (userInfo['following'].indexOf(publisherInfo['username']) === -1) { // if not subscribed
+                document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
+            } else {
+                document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+            }
+        }
     }
 
     // Update activity asynchronously

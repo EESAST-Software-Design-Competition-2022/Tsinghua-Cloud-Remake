@@ -28,7 +28,8 @@ article {
     font-size: small;
 }
 
-.tcr-comments .vinput {
+.tcr-comments .vinput,
+.tcr-comments .vcontent * {
     color: black !important;
 }
 
