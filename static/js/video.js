@@ -14,6 +14,49 @@ let videoInfo = {};
 let userInfo = {};
 let publisherInfo = {};
 
+/**
+ * Update activity menu
+ */
+async function updateActivity() {
+    let activityVideos = [];
+    let followedInfo = {};
+    for (const x of userInfo['following']) {
+        let videos = await (await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'getFileInfo',
+                publisher: x,
+                type: 'video'
+            }, null, 0)
+        })).json();
+        if (videos == false) { // if this user hasn't published any video
+            continue;
+        }
+        activityVideos = activityVideos.concat(videos);
+    }
+    activityVideos.sort((a, b) => (b['time'] - a['time'])); // newer first
+    for (const x of userInfo['following']) {
+        let info = await (await fetch(config.backendURL + '/user/?username=' + x)).json();
+        followedInfo[x] = info;
+    }
+
+    const template = document.querySelector('.tcr-activity>.tcr-list>.tcr-unit');
+    for (let i = 0; i < activityVideos.length; i++) {
+        const x = activityVideos[i];
+        const el = template.cloneNode(true);
+        el.querySelector('img').setAttribute('src', followedInfo[x['publisher']]['avatar_url']);
+        el.querySelector('.tcr-publisher').textContent = followedInfo[x['publisher']]['name'];
+        el.querySelector('.tcr-name').textContent = x['brief'];
+        el.querySelector('.tcr-time').textContent = (new Date(x['time'] * 1000)).toLocaleString('zh-CN');
+        el.querySelector('a').setAttribute('href', x['url']);
+        if (i !== 0) {
+            el.classList.add('border-top');
+        }
+        el.removeAttribute('hidden');
+        document.querySelector('.tcr-activity>.tcr-list').append(el);
+    }
+};
+
 /*
  * Initialization
  */
@@ -80,6 +123,9 @@ let publisherInfo = {};
     for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
         x.textContent = publisherInfo['followed_count'];
     }
+
+    // Update activity asynchronously
+    updateActivity();
 })();
 
 /*
@@ -89,6 +135,12 @@ const fileRealName = shared.pageOptions.fileName.slice(0, -(shared.pageOptions.f
 document.querySelector('title').textContent = fileRealName + ' - 清华大学云盘 Remake'
 document.querySelector('header .tcr-logo').setAttribute('src', config.staticURL + '/img/logo.png')
 document.querySelector('header .tcr-avatar').setAttribute('src', app.config.avatarURL);
+
+document.querySelector('header .tcr-activity-button').addEventListener('click', () => {
+    const el = document.querySelector('.tcr-activity');
+    const toast = new bootstrap.Toast(el);
+    toast.show();
+}); // Show activity menu
 
 document.querySelector('header .tcr-history-button').addEventListener('click', () => {
     const el = document.querySelector('.tcr-history');
@@ -120,7 +172,8 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
                 publisher: app.pageOptions.username,
                 type: 'video',
                 tag: [],
-                brief: '',
+                brief: fileRealName,
+                url: location.origin + location.pathname,
                 metadata: {}
             }, null, 0)
         })
@@ -159,23 +212,6 @@ if (app.pageOptions.username === '') { // if not signed in, disable danmaku send
     player.updateControlItems(['play', 'time', 'spacer', 'danmaku-settings', 'airplay', 'volume', 'settings', 'web-fullscreen', 'fullscreen']);
 }
 player.mount('.tcr-player');
-
-fetch(config.backendURL + '/danmaku/?vid=' + pageID)
-    .then(res => res.json())
-    .then(res => {
-        player.danmaku.resetItems(res);
-        document.querySelector('.tcr-subtitle>.tcr-danmaku-count').textContent = res.length;
-        document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').setAttribute('hidden', '');
-        res.sort((a, b) => (a.time - b.time));
-        for (const danmaku of res) {
-            const el = document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').cloneNode(true);
-            el.querySelector('.tcr-time').textContent = `${Math.floor(danmaku.time / 60).toString().padStart(2, '0')}:${Math.floor(danmaku.time % 60).toString().padStart(2, '0')}`;
-            el.querySelector('.tcr-text').textContent = danmaku.text;
-            el.querySelector('.tcr-author').textContent = danmaku.author;
-            el.removeAttribute('hidden');
-            document.querySelector('.tcr-danmaku-list .tcr-list').append(el);
-        }
-    }); // Load danmakus
 
 // Listen on DanmakuSend event
 player.on('DanmakuSend', opts => {
@@ -272,6 +308,62 @@ document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').a
     document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').setAttribute('hidden', '');
     document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('disabled');
 });
+
+/*
+ * Danmaku List
+ */
+fetch(config.backendURL + '/danmaku/?vid=' + pageID)
+    .then(res => res.json())
+    .then(res => {
+        player.danmaku.resetItems(res);
+        document.querySelector('.tcr-subtitle>.tcr-danmaku-count').textContent = res.length;
+        document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').setAttribute('hidden', '');
+        res.sort((a, b) => (a.time - b.time));
+        for (const danmaku of res) {
+            const el = document.querySelector('.tcr-danmaku-list .tcr-list>.tcr-unit').cloneNode(true);
+            el.querySelector('.tcr-time').textContent = `${Math.floor(danmaku.time / 60).toString().padStart(2, '0')}:${Math.floor(danmaku.time % 60).toString().padStart(2, '0')}`;
+            el.querySelector('.tcr-text').textContent = danmaku.text;
+            el.querySelector('.tcr-author').textContent = danmaku.author;
+            el.removeAttribute('hidden');
+            document.querySelector('.tcr-danmaku-list .tcr-list').append(el);
+        }
+    }); // Load danmakus
+
+/*
+ * Series List
+ */
+fetch(config.backendURL + '/library/', {
+    method: 'POST',
+    body: JSON.stringify({
+        action: 'getFileInfo',
+        pid: pathID,
+        type: 'video'
+    }, null, 0)
+})
+    .then(res => res.json())
+    .then(res => {
+        document.querySelector('.tcr-series-list>.tcr-list>.tcr-unit').setAttribute('hidden', '');
+        if (res == false) {
+            return;
+        }
+        res.sort((a, b) => a['brief'].localeCompare(b['brief']));
+        const template = document.querySelector('.tcr-series-list>.tcr-list>.tcr-unit');
+        for (let i = 0; i < res.length; i++) {
+            const el = template.cloneNode(true);
+            el.querySelector('.tcr-no').textContent = `P${i + 1}`;
+            el.querySelector('.tcr-text').textContent = res[i]['brief'];
+            if (res[i]['fid'] === pageID) {
+                el.classList.replace('text-dark', 'text-primary');
+                el.querySelector('.tcr-status').removeAttribute('hidden');
+            }
+            el.setAttribute('href', res[i]['url']);
+            if (i !== 0) {
+                el.classList.add('border-top');
+            }
+            el.removeAttribute('hidden');
+            document.querySelector('.tcr-series-list>.tcr-list').append(el);
+        }
+    });
 
 /*
  * Comments

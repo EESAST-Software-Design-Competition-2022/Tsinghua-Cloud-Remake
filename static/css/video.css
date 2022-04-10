@@ -56,8 +56,33 @@ aside {
     font-size: 13px;
 }
 
+.tcr-series-list .tcr-list{
+    min-height: 25vh;
+    max-height: 75vh;
+}
+
 .tcr-float-container {
     z-index: 1;
+}
+
+.tcr-activity {
+    min-height: 75vh;
+}
+
+.tcr-activity>.tcr-list>.tcr-unit {
+    width: 90%;
+}
+
+.tcr-activity>.tcr-list>.tcr-unit img {
+    height: 30px;
+}
+
+.tcr-activity>.tcr-list>.tcr-unit small {
+    font-size: small;
+}
+
+.tcr-activity>.tcr-list>.tcr-unit .tcr-name{
+    max-height: 200px;
 }
 
 .tcr-history {

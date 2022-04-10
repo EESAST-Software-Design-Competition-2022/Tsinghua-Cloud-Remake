@@ -18,9 +18,9 @@ function shareFile($data)
     if (!isset($data->poster)) {
         $data->poster = '';
     }
-    $sql = "INSERT INTO `tcr_library` (`fid`, `pid`, `publisher`, `time`, `type`, `tag`, `brief`, `poster`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $pdo->prepare($sql)->execute(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->poster, json_encode($data->metadata)));
-    print_r(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->poster, json_encode($data->metadata)));
+    $sql = "INSERT INTO `tcr_library` (`fid`, `pid`, `publisher`, `time`, `type`, `tag`, `brief`, `url`, `poster`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $pdo->prepare($sql)->execute(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->url, $data->poster, json_encode($data->metadata)));
+    print_r(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->url, $data->poster, json_encode($data->metadata)));
 }
 
 function getFileInfo($query)
@@ -62,6 +62,7 @@ function getFileInfo($query)
             'type' => $list[$i]['type'],
             'tag' => json_decode($list[$i]['tag']),
             'brief' => $list[$i]['brief'],
+            'url' => $list[$i]['url'],
             'visit_count' => (int)$list[$i]['visit_count'],
             'download_count' => (int)$list[$i]['download_count'],
             'like_count' => (int)$list[$i]['like_count'],

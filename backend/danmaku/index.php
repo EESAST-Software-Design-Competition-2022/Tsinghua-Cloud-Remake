@@ -27,7 +27,7 @@ function getAllDanmaku($vid)
     $stmt->execute(array($vid));
     $list = $stmt->fetchAll();
     if ($list == false) {
-        return false;
+        return array();
     }
     for ($i=0; $i < count($list); $i++) { 
         $list[$i]['metadata'] = json_decode($list[$i]['metadata']);

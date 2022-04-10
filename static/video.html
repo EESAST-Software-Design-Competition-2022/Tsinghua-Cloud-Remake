@@ -34,7 +34,8 @@
                     class="bi-book mx-2 fs-5 align-baseline link-dark"></a>
                 <a href="/my-libs/" target="_blank" title="我的资料库" class="bi-hdd mx-2 fs-5 align-baseline link-dark"></a>
                 <a href="#"
-                    class="bi-upload mx-3 px-3 py-1 align-baseline bg-primary rounded-3 text-decoration-none link-light tcr-publish-button" hidden>&nbsp;投稿</a>
+                    class="bi-upload mx-3 px-3 py-1 align-baseline bg-primary rounded-3 text-decoration-none link-light tcr-publish-button"
+                    hidden>&nbsp;投稿</a>
             </span>
         </div>
     </header>
@@ -42,8 +43,8 @@
         <article class="me-4">
             <div class="mb-1 fs-5 tcr-title"></div>
             <div class="mb-3 text-secondary tcr-subtitle">
-                <span class="tcr-view-count">?</span>&nbsp;播放&nbsp;&nbsp;总弹幕数&nbsp;<span class="tcr-danmaku-count"></span>&nbsp;&nbsp;<span
-                    class="tcr-publish-time"></span>
+                <span class="tcr-view-count">?</span>&nbsp;播放&nbsp;&nbsp;总弹幕数&nbsp;<span
+                    class="tcr-danmaku-count"></span>&nbsp;&nbsp;<span class="tcr-publish-time"></span>
             </div>
             <div class="tcr-player w-100"></div>
             <div class="tcr-toolbar mt-3" hidden>
@@ -72,7 +73,8 @@
                             <small class="bi-envelope">&nbsp;发邮件</small>
                         </a>
                     </div>
-                    <button class="btn btn-outline-secondary btn-sm w-75 p-0 text-secondary mt-3 tcr-subscribe-button-disabled"
+                    <button
+                        class="btn btn-outline-secondary btn-sm w-75 p-0 text-secondary mt-3 tcr-subscribe-button-disabled"
                         disabled>
                         <span class="bi-plus-lg me-2"></span>
                         关注
@@ -88,7 +90,7 @@
                     </button>
                 </div>
             </div>
-            <div class="w-100 overflow-auto border p-1 tcr-danmaku-list">
+            <div class="w-100 overflow-auto border p-1 mb-3 tcr-danmaku-list">
                 <div class="py-1 px-2 d-flex justify-content-between">
                     <span>弹幕列表</span>
                     <a class="text-decoration-none link-secondary bi-list" data-bs-toggle="collapse"
@@ -121,6 +123,24 @@
                     </div>
                 </div>
             </div>
+            <div class="w-100 overflow-auto border p-1 tcr-series-list">
+                <div class="py-1 px-2">
+                    <span>视频选集</span>
+                </div>
+                <div class="w-100 overflow-auto vh-75 tcr-list">
+                    <a class="row w-90 mx-auto text-decoration-none text-dark py-2 tcr-unit">
+                        <div class="col-2 pe-0 overflow-hidden">
+                            <small class="text-nowrap tcr-no"></small>
+                        </div>
+                        <div class="col-9 pe-0 overflow-hidden">
+                            <small class="text-nowrap tcr-text">加载中……</small>
+                        </div>
+                        <div class="col-1 pe-0 overflow-hidden">
+                            <small class="text-nowrap spinner-grow-sm tcr-status" hidden></small>
+                        </div>
+                    </a>
+                </div>
+            </div>
             <div class="position-fixed top-0 end-0 p-3 tcr-float-container">
                 <div class="toast tcr-history">
                     <div class="toast-header">
@@ -141,6 +161,30 @@
                                             <small class="text-muted bi-clock tcr-date"></small><br>
                                             <small class="text-muted bi-person tcr-publisher"></small>
                                         </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="toast tcr-activity">
+                    <div class="toast-header">
+                        <span class="bi-activity me-2"></span>
+                        <span class="me-auto">视频动态</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body overflow-auto tcr-list">
+                        <div class="py-2 mx-auto tcr-unit" hidden>
+                            <a class="text-decoration-none link-dark h-100 w-100">
+                                <div class="row h-100 w-100">
+                                    <div class="col-2 h-100 p-1">
+                                        <img src="https://cloud.tsinghua.edu.cn/media/avatars/default.png"
+                                            class="rounded-circle">
+                                    </div>
+                                    <div class="col-10 d-flex flex-column justify-content-center">
+                                        <span class="text-secondary tcr-publisher"></span><br>
+                                        <div class="text-dark fs-5 text-break text-wrap tcr-name overflow-hidden"></div>
+                                        <small class="text-muted tcr-time"></small>
                                     </div>
                                 </div>
                             </a>
