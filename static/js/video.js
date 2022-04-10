@@ -11,6 +11,18 @@
 const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUpperCase(); // Unique ID for each file
 const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice(0, -shared.pageOptions.fileName.length)).toUpperCase(); // Unique ID for each folder
 
+if (app.pageOptions.username !== '') {
+    fetch(config.backendURL + '/user/', {
+        method: 'POST',
+        body: JSON.stringify({
+            username: app.pageOptions.username,
+            name: app.pageOptions.name,
+            email: app.pageOptions.contactEmail,
+            avatar_url: app.config.avatarURL
+        }, null, 0)
+    }); // update user information
+}
+
 /*
  * Head, Icon and Header
  */
@@ -77,17 +89,18 @@ fetch(config.backendURL + '/danmaku/?vid=' + pageID)
 // Listen on DanmakuSend event
 player.on('DanmakuSend', opts => {
     const requestBody = {
+        vid: pageID,
         author: app.pageOptions.name,
         color: opts.color,
         text: opts.text,
         time: opts.time,
         type: opts.type,
-        metadata: JSON.stringify({
+        metadata: {
             email: app.pageOptions.contactEmail,
             send_time: (new Date()).getTime()
-        }, null, 0)
+        }
     };
-    fetch(config.backendURL + '/danmaku/?vid=' + pageID, {
+    fetch(config.backendURL + '/danmaku/', {
         method: 'POST',
         body: JSON.stringify(requestBody, null, 0)
     });

@@ -1,7 +1,7 @@
 <?php
 
 /**
- *    Copyright (c) 2022 Futrime & M1saka10010
+ *    Copyright (c) 2022 Futrime
  *    清华大学云盘 Remake is licensed under Mulan PSL v2.
  *    You can use this software according to the terms and conditions of the Mulan PSL v2. 
  *    You may obtain a copy of Mulan PSL v2 at:
@@ -12,14 +12,40 @@
 
 require "../config.php";
 
-function addDanmaku($vid, $data)
+function updateUserInfo($data)
 {
     global $pdo;
-    $sql = "INSERT INTO `tcr_danmaku` (`vid`, `author`, `color`,`text`,`time`,`type`,`metadata`) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $pdo->prepare($sql)->execute(array($vid, $data->author, $data->color, $data->text, $data->time, $data->type, $data->metadata));
+    $stmt = $pdo->prepare("SELECT * FROM `tcr_user` WHERE `username`=? ");
+    $stmt->execute(array($data->username));
+    $list = $stmt->fetch();
+    if ($list == false) { // if the user is not existed
+        if (!isset($data->following)) {
+            $data->following = array();
+        }
+        if (!isset($data->collection)) {
+            $data->collection = array();
+        }
+        if (!isset($data->metadata)) {
+            $data->metadata = new stdClass();
+        }
+        $sql = "INSERT INTO `tcr_user` (`username`, `name`, `email`, `following`, `collection`, `avatar_url`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $pdo->prepare($sql)->execute(array($data->username, $data->name, $data->email, json_encode($data->following), json_encode($data->collection), $data->avatar_url, json_encode($data->metadata)));
+    } else {
+        if (!isset($data->following)) {
+            $data->following = json_decode($list['following']);
+        }
+        if (!isset($data->collection)) {
+            $data->collection = json_decode($list['collection']);
+        }
+        if (!isset($data->metadata)) {
+            $data->metadata = json_decode($list['metadata']);
+        }
+        $sql = "UPDATE `tcr_user` SET `name`=?, `email`=?, `following`=?, `collection`=?, `avatar_url`=?, `metadata`=? WHERE `username`=?";
+        $pdo->prepare($sql)->execute(array($data->name, $data->email, json_encode($data->following), json_encode($data->collection), $data->avatar_url, json_encode($data->metadata), $data->username));
+    }
 }
 
-function getUser($username)
+function getUserInfo($username)
 {
     global $pdo;
     $sql = "SELECT * FROM `tcr_user` WHERE `username`=? ";
@@ -29,20 +55,19 @@ function getUser($username)
     if ($list == false) {
         return false;
     }
-    return array('username' => $list['username'], 'name' => $list['name'], 'email' => $list['email'], 'following' => $list['following'], 'collection' => $list['collection'], 'avatar_url' => $list['avatar_url'], 'metadata' => $list['metadata']);
+    return array('username' => $list['username'], 'name' => $list['name'], 'email' => $list['email'], 'following' => json_decode($list['following']), 'collection' => json_decode($list['collection']), 'avatar_url' => $list['avatar_url'], 'metadata' => json_decode($list['metadata']));
 }
 
 
 $pdo = new PDO('mysql:host=' . DB_HOST . ';' . 'dbname=' . DB_NAME, DB_USER, DB_PASS);
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get all danmakus
+if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get user information
     $username = $_GET['username'];
-    $result = getUser($username);
+    $result = getUserInfo($username);
     $json = json_encode($result);
     header('Content-Type: application/json');
     echo ($json);
-} else if ($_SERVER['REQUEST_METHOD'] == 'POST') { // add a danmaku
-    $vid = $_GET['vid'];
+} else if ($_SERVER['REQUEST_METHOD'] == 'POST') { // update user information
     $data = json_decode(file_get_contents('php://input'));
-    addDanmaku($vid, $data);
+    updateUserInfo($data);
 }

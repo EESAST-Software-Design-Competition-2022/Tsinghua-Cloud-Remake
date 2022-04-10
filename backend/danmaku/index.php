@@ -12,11 +12,11 @@
 
 require "../config.php";
 
-function addDanmaku($vid, $data)
+function addDanmaku($data)
 {
     global $pdo;
     $sql = "INSERT INTO `tcr_danmaku` (`vid`, `author`, `color`,`text`,`time`,`type`,`metadata`) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $pdo->prepare($sql)->execute(array($vid, $data->author, $data->color, $data->text, $data->time, $data->type, $data->metadata));
+    $pdo->prepare($sql)->execute(array($data->vid, $data->author, $data->color, $data->text, $data->time, $data->type, json_encode($data->metadata)));
 }
 
 function getAllDanmaku($vid)
@@ -25,7 +25,14 @@ function getAllDanmaku($vid)
     $sql = "SELECT * FROM `tcr_danmaku` WHERE `vid`=? ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(array($vid));
-    return $stmt->fetchAll();
+    $list = $stmt->fetchAll();
+    if ($list == false) {
+        return false;
+    }
+    for ($i=0; $i < count($list); $i++) { 
+        $list[$i]['metadata'] = json_decode($list[$i]['metadata']);
+    }
+    return $list;
 }
 
 $db_host = DB_HOST;
@@ -47,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get all danmakus
     header('Content-Type: application/json');
     echo ($json);
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') { // add a danmaku
-    $vid = $_GET['vid'];
     $data = json_decode(file_get_contents('php://input'));
-    addDanmaku($vid, $data);
+    addDanmaku($data);
 }
