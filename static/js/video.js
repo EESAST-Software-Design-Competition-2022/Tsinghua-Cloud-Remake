@@ -271,7 +271,7 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
                 type: 'video',
                 tag: [],
                 brief: fileRealName,
-                url: location.origin + location.pathname,
+                url: location.href,
                 metadata: {
                     like_list: []
                 }
