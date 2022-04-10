@@ -41,6 +41,13 @@ aside {
     width: 60px;
 }
 
+.tcr-publisher-info .tcr-subscribe-button,
+.tcr-publisher-info .tcr-subscribe-button-disabled,
+.tcr-publisher-info .tcr-subscribe-button-subscribed {
+    height: 25px;
+    max-width: 120px;
+}
+
 .tcr-danmaku-list .tcr-list {
     max-height: 50vh;
 }

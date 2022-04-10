@@ -10,18 +10,77 @@
 
 const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUpperCase(); // Unique ID for each file
 const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice(0, -shared.pageOptions.fileName.length)).toUpperCase(); // Unique ID for each folder
+let videoInfo = {};
+let userInfo = {};
+let publisherInfo = {};
 
-if (app.pageOptions.username !== '') {
-    fetch(config.backendURL + '/user/', {
+/*
+ * Initialization
+ */
+(async () => {
+    // Load information
+    videoInfo = await (await fetch(config.backendURL + '/library/', {
         method: 'POST',
         body: JSON.stringify({
-            username: app.pageOptions.username,
-            name: app.pageOptions.name,
-            email: app.pageOptions.contactEmail,
-            avatar_url: app.config.avatarURL
+            action: 'getFileInfo',
+            fid: pageID,
+            type: 'video'
         }, null, 0)
-    }); // update user information
-}
+    })).json();
+
+    if (videoInfo === false) { // if the video is not recorded in remote library
+        document.querySelector('header .tcr-publish-button').removeAttribute('hidden');
+        document.querySelector('.tcr-publisher-info .tcr-name').textContent = shared.pageOptions.sharedBy + '（资料库）';
+        return;
+    }
+    videoInfo = videoInfo[0]; // Only need information of current video
+
+    if (app.pageOptions.username !== '') {
+        fetch(config.backendURL + '/user/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'updateUserInfo',
+                username: app.pageOptions.username,
+                name: app.pageOptions.name,
+                email: app.pageOptions.contactEmail,
+                avatar_url: app.config.avatarURL
+            }, null, 0)
+        }); // update user information, not need to wait
+        userInfo = await (await fetch(config.backendURL + '/user/?username=' + app.pageOptions.username)).json();
+    }
+
+    publisherInfo = await (await fetch(config.backendURL + '/user/?username=' + videoInfo.publisher)).json();
+
+    // Update subtitle
+    document.querySelector('.tcr-subtitle>.tcr-view-count').textContent = videoInfo['visit_count'];
+    document.querySelector('.tcr-subtitle>.tcr-publish-time').textContent = (new Date(videoInfo['time'] * 1000)).toLocaleString('zh-CN');
+
+    // Update toolbar
+    document.querySelector('.tcr-toolbar').removeAttribute('hidden');
+    document.querySelector('.tcr-toolbar .tcr-like-count').textContent = videoInfo['like_count'];
+    document.querySelector('.tcr-toolbar .tcr-collect-count').textContent = videoInfo['collect_count'];
+    document.querySelector('.tcr-toolbar .tcr-download-count').textContent = videoInfo['download_count'];
+
+    // Update publisher information
+    document.querySelector('.tcr-publisher-info>.tcr-avatar').setAttribute('src', publisherInfo['avatar_url']);
+
+    document.querySelector('.tcr-publisher-info .tcr-name').textContent = publisherInfo['name'];
+    document.querySelector('.tcr-publisher-info .tcr-name').classList.replace('link-secondary', 'link-primary');
+
+    document.querySelector('.tcr-publisher-info .tcr-email-button').setAttribute('href', 'mailto:' + publisherInfo.email);
+    document.querySelector('.tcr-publisher-info .tcr-email-button').removeAttribute('hidden');
+
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-disabled').setAttribute('hidden', '');
+    if (userInfo['following'].indexOf(publisherInfo['username']) === -1) { // if not subscribed
+        document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
+    } else {
+        document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+    }
+
+    for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
+        x.textContent = publisherInfo['followed_count'];
+    }
+})();
 
 /*
  * Head, Icon and Header
@@ -35,6 +94,38 @@ document.querySelector('header .tcr-history-button').addEventListener('click', (
     const el = document.querySelector('.tcr-history');
     const toast = new bootstrap.Toast(el);
     toast.show();
+}); // Show history menu
+
+document.querySelector('header .tcr-publish-button').addEventListener('click', async () => {
+    const spinner = document.createElement('span');
+    spinner.classList.add('spinner-border');
+    spinner.classList.add('spinner-border-sm');
+    spinner.classList.add('ms-1');
+    document.querySelector('header .tcr-publish-button').append(spinner);
+    const videoInfo = await (await fetch(config.backendURL + '/library/', {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'getFileInfo',
+            fid: pageID,
+            type: 'video'
+        }, null, 0)
+    })).json();
+    if (videoInfo == false) { // if current video is not in remote library
+        await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'shareFile',
+                fid: pageID,
+                pid: pathID,
+                publisher: app.pageOptions.username,
+                type: 'video',
+                tag: [],
+                brief: '',
+                metadata: {}
+            }, null, 0)
+        })
+    }
+    location.reload();
 });
 
 /*
@@ -113,6 +204,76 @@ document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('href',
 document.querySelector('.tcr-toolbar>.tcr-download-button').setAttribute('download', shared.pageOptions.fileName);
 
 /*
+ * Publisher Information
+ */
+document.querySelector('.tcr-publisher-info .tcr-subscribe-button').addEventListener('click', async () => {
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button').setAttribute('disabled', '');
+
+    userInfo['following'].push(publisherInfo['username']);
+    userInfo['following'] = Array.from(new Set(userInfo['following'])); // remove duplicated items
+
+    const spinner = document.createElement('span');
+    spinner.classList.add('spinner-border');
+    spinner.classList.add('spinner-border-sm');
+    spinner.classList.add('ms-1');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button').append(spinner);
+
+    await fetch(config.backendURL + '/user/', {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'followUser',
+            username: app.pageOptions.username,
+            follow: publisherInfo['username'],
+            type: 'follow'
+        }, null, 0)
+    }); // update user information, not need to wait
+
+    publisherInfo['followed_count'] += 1;
+    for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
+        x.textContent = publisherInfo['followed_count'];
+    }
+
+    spinner.remove();
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button').setAttribute('hidden', '');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('hidden');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('disabled');
+});
+
+document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').addEventListener('click', async () => {
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').setAttribute('disabled', '');
+
+    if (userInfo['following'].indexOf(publisherInfo['username']) !== -1) {
+        userInfo['following'].splice(userInfo['following'].indexOf(publisherInfo['username']), 1);
+    }
+
+    const spinner = document.createElement('span');
+    spinner.classList.add('spinner-border');
+    spinner.classList.add('spinner-border-sm');
+    spinner.classList.add('ms-1');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').append(spinner);
+
+    await fetch(config.backendURL + '/user/', {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'followUser',
+            username: app.pageOptions.username,
+            follow: publisherInfo['username'],
+            type: 'unfollow'
+        }, null, 0)
+    }); // update user information, not need to wait
+
+    publisherInfo['followed_count'] -= 1;
+    for (const x of document.querySelectorAll('.tcr-publisher-info .tcr-subscribe-count')) {
+        x.textContent = publisherInfo['followed_count'];
+    }
+
+    spinner.remove();
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button').removeAttribute('hidden');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').setAttribute('hidden', '');
+    document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('disabled');
+});
+
+/*
  * Comments
  */
 const comments = new Valine({
@@ -127,11 +288,6 @@ const comments = new Valine({
     recordIP: true,
     serverURLs: 'https://ocjpj9bo.api.lncldglobal.com'
 });
-
-/*
- * Publisher Info
- */
-document.querySelector('.tcr-publisher-info .tcr-name').textContent = '未知用户';
 
 /*
  * History

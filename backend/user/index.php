@@ -45,6 +45,25 @@ function updateUserInfo($data)
     }
 }
 
+function followUser($data)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM `tcr_user` WHERE `username`=? ");
+    $stmt->execute(array($data->username));
+    $follower = $stmt->fetch();
+    $follower['following'] = json_decode($follower['following']);
+    print_r($data);
+    if ($data->type == 'follow') {
+        $follower['following'][] = $data->follow;
+        $pdo->prepare("UPDATE `tcr_user` SET `following`=? WHERE `username`=? ; UPDATE `tcr_user` SET `followed_count`=`followed_count` + 1 WHERE `username`=? ;")
+            ->execute(array(json_encode($follower['following']), $data->username, $data->follow));
+    } else if ($data->type == 'unfollow') {
+        array_splice($follower['following'], array_search($data->follow, $follower['following']), 1);
+        $pdo->prepare("UPDATE `tcr_user` SET `following`=? WHERE `username`=? ; UPDATE `tcr_user` SET `followed_count`=`followed_count` - 1 WHERE `username`=? ;")
+            ->execute(array(json_encode($follower['following']), $data->username, $data->follow));
+    }
+}
+
 function getUserInfo($username)
 {
     global $pdo;
@@ -55,7 +74,7 @@ function getUserInfo($username)
     if ($list == false) {
         return false;
     }
-    return array('username' => $list['username'], 'name' => $list['name'], 'email' => $list['email'], 'following' => json_decode($list['following']), 'collection' => json_decode($list['collection']), 'avatar_url' => $list['avatar_url'], 'metadata' => json_decode($list['metadata']));
+    return array('username' => $list['username'], 'name' => $list['name'], 'email' => $list['email'], 'followed_count' => (int)$list['followed_count'], 'following' => json_decode($list['following']), 'collection' => json_decode($list['collection']), 'avatar_url' => $list['avatar_url'], 'metadata' => json_decode($list['metadata']));
 }
 
 
@@ -69,5 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') { // get user information
     echo ($json);
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') { // update user information
     $data = json_decode(file_get_contents('php://input'));
-    updateUserInfo($data);
+    if ($data->action == 'updateUserInfo') {
+        updateUserInfo($data);
+    } else if ($data->action == 'followUser') {
+        followUser($data);
+    }
 }

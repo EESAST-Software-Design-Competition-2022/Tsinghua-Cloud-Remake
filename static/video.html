@@ -34,7 +34,7 @@
                     class="bi-book mx-2 fs-5 align-baseline link-dark"></a>
                 <a href="/my-libs/" target="_blank" title="我的资料库" class="bi-hdd mx-2 fs-5 align-baseline link-dark"></a>
                 <a href="#"
-                    class="bi-upload mx-3 px-3 py-1 align-baseline bg-info rounded-3 text-decoration-none link-light tcr-publish-button"> 投稿</a>
+                    class="bi-upload mx-3 px-3 py-1 align-baseline bg-primary rounded-3 text-decoration-none link-light tcr-publish-button" hidden>&nbsp;投稿</a>
             </span>
         </div>
     </header>
@@ -42,11 +42,11 @@
         <article class="me-4">
             <div class="mb-1 fs-5 tcr-title"></div>
             <div class="mb-3 text-secondary tcr-subtitle">
-                <span class="tcr-view-count"></span> 播放 总弹幕数 <span class="tcr-danmaku-count"></span> <span
+                <span class="tcr-view-count">?</span>&nbsp;播放&nbsp;&nbsp;总弹幕数&nbsp;<span class="tcr-danmaku-count"></span>&nbsp;&nbsp;<span
                     class="tcr-publish-time"></span>
             </div>
             <div class="tcr-player w-100"></div>
-            <div class="tcr-toolbar mt-3">
+            <div class="tcr-toolbar mt-3" hidden>
                 <a href="#" title="点赞" class="tcr-like-button text-decoration-none link-dark me-5">
                     <span class="bi-hand-thumbs-up-fill fs-3 me-2 align-middle"></span>
                     <span class="align-middle tcr-like-count">?</span>
@@ -67,15 +67,23 @@
                 <img src="https://cloud.tsinghua.edu.cn/media/avatars/default.png" class="rounded-circle tcr-avatar">
                 <div class="ms-3 w-75">
                     <div>
-                        <span class="me-2 tcr-name"></span>
-                        <a href="mailto:" class="link-secondary text-decoration-none" hidden>
-                            <small class="bi-envelope"> 发消息</small>
+                        <strong><a href="#" class="me-2 text-decoration-none link-secondary tcr-name">?</a></strong>
+                        <a href="mailto:" class="link-secondary text-decoration-none tcr-email-button" hidden>
+                            <small class="bi-envelope">&nbsp;发邮件</small>
                         </a>
                     </div>
-                    <button class="btn btn-outline-secondary w-75 h-50 p-0 text-secondary mt-3 tcr-subsribe-button"
+                    <button class="btn btn-outline-secondary btn-sm w-75 p-0 text-secondary mt-3 tcr-subscribe-button-disabled"
                         disabled>
                         <span class="bi-plus-lg me-2"></span>
                         关注
+                    </button>
+                    <button class="btn btn-primary btn-sm text-light w-75 p-0 mt-3 tcr-subscribe-button" hidden>
+                        <span class="bi-plus-lg me-2"></span>
+                        关注
+                        <span class="ms-1 tcr-subscribe-count"></span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm w-75 p-0 mt-3 tcr-subscribe-button-subscribed" hidden>
+                        取消关注
                         <span class="ms-1 tcr-subscribe-count"></span>
                     </button>
                 </div>

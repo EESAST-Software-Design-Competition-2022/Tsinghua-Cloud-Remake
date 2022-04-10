@@ -20,6 +20,7 @@ function shareFile($data)
     }
     $sql = "INSERT INTO `tcr_library` (`fid`, `pid`, `publisher`, `time`, `type`, `tag`, `brief`, `poster`, `metadata`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $pdo->prepare($sql)->execute(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->poster, json_encode($data->metadata)));
+    print_r(array($data->fid, $data->pid, $data->publisher, time(), $data->type, json_encode($data->tag), $data->brief, $data->poster, json_encode($data->metadata)));
 }
 
 function getFileInfo($query)
