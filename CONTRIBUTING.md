@@ -71,3 +71,37 @@
 API后端由PHP开发，包含数据库操作和数据处理。
 
 API后端的开发原则是尽可能少进行计算，从而减小服务器压力。进一步说，API后端尽可能被定为前端与数据库互通的接口。
+
+### 组件
+
+为了便于轻量的修改和开发，自`v1.0.0-beta-2`版本开始，引入组件模块。
+
+组件由入口JavaScript文件`widget.js`和其它资源文件组成，并由脚本异步加载。
+
+`/static/widgets.json`文件内包含一个含所有组件的简要信息的JSON数组。使用组件时，应当在`/static/widgets.json`中填写组件相关的信息，示例如下：
+
+```json
+{
+    "id": "shao-note",
+    "url": "",
+    "name": "SHAO Note",
+    "description": "A note taking widget based on SHAO-Pastebin",
+    "context": [
+        "video"
+    ],
+    "enabled": true
+}
+```
+
+|键|值类型|名称|描述|
+|---|---|---|---|
+|id|string|组件ID|组件识别字符串，仅可包含英文小写字母、数字和连字符|
+|url|string|组件URL|（可选）如果需要从外部加载组件，请填写此项，否则置空|
+|name|string|组件名|组件的名称|
+|description|string|组件描述|组件的描述|
+|context|array|组件环境|组件将在该数组中列出的环境中被激活|
+|enabled|boolean|是否激活组件|如果为true，组件将被激活|
+
+组件可以通过填写`url`键值实现从支持CORS的外部地址加载。如果`url`为空，脚本将会加载静态后端中`widgets`路径下以组件ID为名称的文件夹中的`widget.js`.
+
+组件运行过程中可以通过调用全局变量`widgetList`查看所有组件的信息。

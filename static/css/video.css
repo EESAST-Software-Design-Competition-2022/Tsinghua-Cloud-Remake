@@ -62,8 +62,9 @@ aside {
     max-height: 75vh;
 }
 
-.tcr-float-container {
-    z-index: 1;
+.tcr-float-container-top-end,
+.tcr-float-container-bottom-end {
+    z-index: 100000;
 }
 
 .tcr-activity {
