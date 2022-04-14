@@ -9,8 +9,8 @@
  */
 
 /**
- *    TsinghuaCloudRemake Widget
  *    SHAO Note
+ *    TsinghuaCloudRemake Official Widget
  *    A note taking widget based on SHAO-Pastebin
  *    id: shao-note
  *    context: [video]
