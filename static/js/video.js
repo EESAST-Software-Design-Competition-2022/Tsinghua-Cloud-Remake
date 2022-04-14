@@ -13,6 +13,7 @@ const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice
 let videoInfo = false;
 let userInfo = false;
 let publisherInfo = false;
+let widgetList = false;
 
 /**
  * Update activity menu
@@ -107,6 +108,7 @@ async function updateCollection() {
         document.querySelector('.tcr-collection>.tcr-list').append(el);
     }
 };
+
 
 /*
  * Initialization
@@ -215,9 +217,25 @@ async function updateCollection() {
     }
 })();
 
-
-
-
+/*
+ * Widget Initialization
+ */
+(async () => {
+    widgetList = await (await fetch(config.staticURL + '/widgets.json')).json();
+    for (const widget of widgetList) {
+        if (widget['context'].indexOf('video') === -1 || // if the widget cannot work in video context
+            widget['enabled'] === false) { // if the widget is disabled
+            continue;
+        }
+        let jsNode = document.createElement('script');
+        if (widget['url'] === '') { // default
+            jsNode.setAttribute('src', `${config.staticURL}/widgets/${widget['id']}/widget.js`);
+        } else {
+            jsNode.setAttribute('src', `${widget['url']}/widget.js`);
+        }
+        document.querySelector('body').append(jsNode);
+    }
+})();
 
 
 /*

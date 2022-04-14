@@ -1,0 +1,12 @@
+[
+    {
+        "id": "shao-note",
+        "url": "",
+        "name": "SHAO-Note",
+        "description": "A note taking widget based on SHAO-Pastebin",
+        "context": [
+            "video"
+        ],
+        "enabled": true
+    }
+]
