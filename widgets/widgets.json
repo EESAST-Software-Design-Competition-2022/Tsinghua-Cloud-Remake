@@ -1,12 +1,13 @@
 [
     {
+        "type": "widget",
+        "runtime": "async",
         "id": "shao-note",
-        "url": "",
+        "url": "https://tsinghuacloudremake.api.021121.xyz/widgets/shao-note",
         "name": "SHAO-Note",
         "description": "A note taking widget based on SHAO-Pastebin",
         "context": [
             "video"
-        ],
-        "enabled": true
+        ]
     }
 ]

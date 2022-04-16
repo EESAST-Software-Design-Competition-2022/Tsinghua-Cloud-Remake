@@ -27,7 +27,13 @@
  */
 const config = {
     staticURL: 'https://tsinghuacloudremake.api.021121.xyz/static',
-    backendURL: 'https://tsinghuacloudremake.api.021121.xyz'
+    backendURL: 'https://tsinghuacloudremake.api.021121.xyz',
+    widgetIndex: [
+        {
+            "type": "index",
+            "url": "https://tsinghuacloudremake.api.021121.xyz/widgets/widgets.json"
+        }
+    ]
 };
 
 (async () => {
@@ -37,7 +43,7 @@ const config = {
         return; // only support video pages currently
     }
 
-    console.log('TsinghuaCloudRemake is loaded!');
+    console.info('[TCR] TsinghuaCloudRemake is loaded.');
 
     const pages = {
         video: await fetch(config.staticURL + '/video.html').then((res) => res.text())
@@ -49,5 +55,6 @@ const config = {
     const configNode = document.createElement('meta');
     configNode.setAttribute('data-tcr-static-url', config.staticURL);
     configNode.setAttribute('data-tcr-backend-url', config.backendURL);
+    configNode.setAttribute('data-tcr-widget-index', JSON.stringify(config.widgetIndex, null, 0));
     document.querySelector('head').append(configNode);
 })();

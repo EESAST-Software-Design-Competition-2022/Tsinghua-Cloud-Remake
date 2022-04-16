@@ -8,12 +8,59 @@
  *    See the Mulan PSL v2 for more details.  
  */
 
+/***********************************
+ * Declaration of Global Variables *
+ ***********************************/
+
 const pageID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath).toUpperCase(); // Unique ID for each file
 const pathID = md5(shared.pageOptions.repoID + shared.pageOptions.filePath.slice(0, -shared.pageOptions.fileName.length)).toUpperCase(); // Unique ID for each folder
+const fileRealName = shared.pageOptions.fileName.slice(0, -(shared.pageOptions.fileExt.length + 1)); // The filename without extension suffix
+const g_sharedVariable = {}; // An object storing all shared variables
+const widgetList = [];
+let enabledWidgetList = [];
 let videoInfo = false;
 let userInfo = false;
 let publisherInfo = false;
-let widgetList = false;
+
+
+/*************
+ * Functions *
+ *************/
+
+/**
+ * The function to execute when a switch in widget menu is changed
+ * @param {Event} event A change event
+ */
+function changeWidgetSwitch(event) {
+    const id = event.target.parentElement.parentElement.getAttribute('data-tcr-widget-id');
+    const status = event.target.checked;
+    if (status === true && enabledWidgetList.indexOf(id) === -1) {
+        enabledWidgetList.push(id);
+    } else if (status === false && enabledWidgetList.indexOf(id) !== -1) {
+        enabledWidgetList.splice(enabledWidgetList.indexOf(id));
+    }
+    localStorage.setItem('tcr:enabled_widgets', JSON.stringify(enabledWidgetList, null, 0));
+}
+
+/**
+ * Parse all widgets and remote indexes in a widget index and save to widgetList
+ * @param {array} widgetIndex A widget index list
+ * @param {string} url The url of this widget index file
+ */
+async function getWidgets(widgetIndex) {
+    if (g_sharedVariable.fetchedWidgets === undefined) {
+        g_sharedVariable.fetchedWidgets = [];
+    }
+    for (const item of widgetIndex) {
+        if (item.type === 'widget' && g_sharedVariable.fetchedWidgets.indexOf(item.id) === -1) {
+            g_sharedVariable.fetchedWidgets.push(item.id);
+            widgetList.push(item);
+        } else if (item.type === 'index') {
+            let index = await fetch(item.url).then(res => res.json());
+            await getWidgets(index);
+        }
+    }
+}
 
 /**
  * Update activity menu
@@ -110,22 +157,44 @@ async function updateCollection() {
 };
 
 
-/*
- * Initialization
- */
+/******************
+ * Initialization *
+ ******************/
 (async () => {
-    // Load information
-    let tmp_videoInfo = await (await fetch(config.backendURL + '/library/', {
-        method: 'POST',
-        body: JSON.stringify({
-            action: 'getFileInfo',
-            fid: pageID,
-            type: 'video'
-        }, null, 0)
-    })).json();
+    await getWidgets(config.widgetIndex); // get all widgets
+    if (localStorage.getItem('tcr:enabled_widgets') === null) {
+        localStorage.setItem('tcr:enabled_widgets', JSON.stringify([], null, 0));
+        enabledWidgetList = [];
+    } else {
+        enabledWidgetList = JSON.parse(localStorage.getItem('tcr:enabled_widgets'));
+    }
 
-    if (tmp_videoInfo !== false) {
-        videoInfo = tmp_videoInfo[0]; // Only need information of current video
+    // Load asynchronous widgets
+    for (const widget of widgetList) {
+        if (widget.context.indexOf('video') === -1 || // if the widget cannot run in video context
+            widget.runtime === 'defer' || // if the widget should be run after initialization
+            enabledWidgetList.indexOf(widget.id) === -1 // if the widget is disabled
+        ) {
+            continue;
+        }
+        let jsNode = document.createElement('script');
+        jsNode.setAttribute('src', `${widget.url}/widget.js`);
+        jsNode.setAttribute('async', '');
+        document.querySelector('body').append(jsNode);
+    }
+
+    // Load video information
+    try {
+        videoInfo = (await (await fetch(config.backendURL + '/library/', {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'getFileInfo',
+                fid: pageID,
+                type: 'video'
+            }, null, 0)
+        })).json())[0];
+    } catch (error) {
+        console.log('[TCR] This video has not been uploaded.');
     }
 
     if (app.pageOptions.username !== '') {
@@ -181,7 +250,7 @@ async function updateCollection() {
     }
 
     // Update publisher information
-    if (videoInfo === false) {
+    if (videoInfo === false) { // if this video has not been uploaded
         document.querySelector('.tcr-publisher-info .tcr-name').textContent = shared.pageOptions.sharedBy + '（资料库）'; // Display repo sharer
     } else {
         document.querySelector('.tcr-publisher-info>.tcr-avatar').setAttribute('src', publisherInfo['avatar_url']);
@@ -215,33 +284,46 @@ async function updateCollection() {
     if (userInfo !== false) {
         updateCollection();
     }
-})();
 
-/*
- * Widget Initialization
- */
-(async () => {
-    widgetList = await (await fetch(config.staticURL + '/widgets.json')).json();
+    // Update widget menu
     for (const widget of widgetList) {
-        if (widget['context'].indexOf('video') === -1 || // if the widget cannot work in video context
-            widget['enabled'] === false) { // if the widget is disabled
+        const el = document.querySelector('.tcr-widget>.tcr-list>.tcr-unit[hidden]').cloneNode(true);
+        window.ele = el;
+        el.removeAttribute('hidden');
+        el.setAttribute('data-tcr-widget-id', widget.id);
+        el.querySelector('.tcr-name').textContent = widget.name;
+        if (enabledWidgetList.indexOf(widget.id) !== -1) {
+            el.querySelector('.tcr-switch').setAttribute('checked', '');
+        }
+        el.addEventListener('change', changeWidgetSwitch);
+        document.querySelector('.tcr-widget>.tcr-list').append(el);
+    }
+
+    // Load deferred widgets
+    for (const widget of widgetList) {
+        if (widget.context.indexOf('video') === -1 || // if the widget cannot run in video context
+            widget.runtime === 'async' || // if the widget should be run after initialization
+            enabledWidgetList.indexOf(widget.id) === -1 // if the widget is disabled
+        ) {
             continue;
         }
         let jsNode = document.createElement('script');
-        if (widget['url'] === '') { // default
-            jsNode.setAttribute('src', `${config.staticURL}/widgets/${widget['id']}/widget.js`);
-        } else {
-            jsNode.setAttribute('src', `${widget['url']}/widget.js`);
-        }
+        jsNode.setAttribute('src', `${widget.url}/widget.js`);
+        jsNode.setAttribute('defer', '');
         document.querySelector('body').append(jsNode);
     }
+
+    document.querySelector('.tcr-loading-mask').setAttribute('hidden', ''); // Remove loading spinner
 })();
 
 
-/*
+/**************
+ * Main Logic *
+ **************/
+
+/**
  * Head, Icon and Header
  */
-const fileRealName = shared.pageOptions.fileName.slice(0, -(shared.pageOptions.fileExt.length + 1));
 document.querySelector('title').textContent = fileRealName + ' - 清华大学云盘 Remake'
 document.querySelector('header .tcr-logo').setAttribute('src', config.staticURL + '/img/logo.png')
 document.querySelector('header .tcr-avatar').setAttribute('src', app.config.avatarURL);
@@ -263,6 +345,12 @@ document.querySelector('header .tcr-history-button').addEventListener('click', (
     const toast = new bootstrap.Toast(el);
     toast.show();
 }); // show history menu
+
+document.querySelector('header .tcr-widget-button').addEventListener('click', () => {
+    const el = document.querySelector('.tcr-widget');
+    const toast = new bootstrap.Toast(el);
+    toast.show();
+}); // show widget menu
 
 document.querySelector('header .tcr-publish-button').addEventListener('click', async () => {
     const spinner = document.createElement('span');
@@ -299,12 +387,12 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
     location.reload();
 });
 
-/*
+/**
  * Title and Subtitle
  */
 document.querySelector('.tcr-title').textContent = fileRealName;
 
-/*
+/**
  * Player
  */
 const player = new window.NPlayer.Player({
@@ -368,7 +456,7 @@ player.on('Play', () => {
     }
 });
 
-/*
+/**
  * Toolbar
  */
 // Like button
@@ -461,7 +549,7 @@ document.querySelector('.tcr-toolbar>.tcr-download-button').addEventListener('cl
     })
 });
 
-/*
+/**
  * Publisher Information
  */
 document.querySelector('.tcr-publisher-info .tcr-subscribe-button').addEventListener('click', async () => {
@@ -531,7 +619,7 @@ document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').a
     document.querySelector('.tcr-publisher-info .tcr-subscribe-button-subscribed').removeAttribute('disabled');
 });
 
-/*
+/**
  * Danmaku List
  */
 fetch(config.backendURL + '/danmaku/?vid=' + pageID)
@@ -551,7 +639,7 @@ fetch(config.backendURL + '/danmaku/?vid=' + pageID)
         }
     }); // Load danmakus
 
-/*
+/**
  * Series List
  */
 fetch(config.backendURL + '/library/', {
@@ -603,10 +691,10 @@ const comments = new Valine({
     serverURLs: 'https://ocjpj9bo.api.lncldglobal.com'
 });
 
-/*
+/**
  * History
  */
-(() => {
+(async () => {
     document.querySelector('.tcr-player video').addEventListener('pause', (event) => {
         const video = document.querySelector('.tcr-player video');
         const canvas = document.createElement('canvas');
