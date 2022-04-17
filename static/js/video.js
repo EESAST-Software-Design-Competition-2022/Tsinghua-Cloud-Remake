@@ -196,6 +196,9 @@ async function updateCollection() {
     } catch (error) {
         console.log('[TCR] This video has not been uploaded.');
     }
+    if (videoInfo === undefined) {
+        videoInfo = false;
+    }
 
     if (app.pageOptions.username !== '') {
         await fetch(config.backendURL + '/user/', {
@@ -358,7 +361,7 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
     spinner.classList.add('spinner-border-sm');
     spinner.classList.add('ms-1');
     document.querySelector('header .tcr-publish-button').append(spinner);
-    const videoInfo = await (await fetch(config.backendURL + '/library/', {
+    const info = await (await fetch(config.backendURL + '/library/', {
         method: 'POST',
         body: JSON.stringify({
             action: 'getFileInfo',
@@ -366,7 +369,7 @@ document.querySelector('header .tcr-publish-button').addEventListener('click', a
             type: 'video'
         }, null, 0)
     })).json();
-    if (videoInfo == false) { // if current video is not in remote library
+    if (info == false) { // if current video is not in remote library
         await fetch(config.backendURL + '/library/', {
             method: 'POST',
             body: JSON.stringify({
