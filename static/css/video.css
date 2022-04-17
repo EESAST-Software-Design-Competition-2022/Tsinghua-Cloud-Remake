@@ -67,6 +67,14 @@ aside {
     z-index: 100000;
 }
 
+.tcr-widget {
+    min-height: 75vh;
+}
+
+.tcr-widget>.tcr-list>.tcr-unit {
+    width: 90%;
+}
+
 .tcr-activity {
     min-height: 75vh;
 }
@@ -120,4 +128,8 @@ aside {
     object-fit: cover;
     height: 100%;
     width: 100%;
+}
+
+.tcr-loading-mask {
+    z-index: 114514;
 }

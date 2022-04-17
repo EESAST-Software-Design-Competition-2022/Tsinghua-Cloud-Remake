@@ -11,27 +11,6 @@
 * 在[SHAO Pastebin](https://shao-pastebin.futrime.com)中管理笔记
 * 使用[SHAO Pastebin](https://shao-pastebin.futrime.com)完善、美化并分享笔记
 
-## 安装
-
-正常情况下，本插件已经安装并默认开启。如果需要关闭，请在 **清华大学云盘Remake** 的`/widgets.json`中进行修改，将 **enabled** 键改为`false`.
-
-如果希望将本组件安装于外部服务器，请删除**清华大学云盘Remake** 的`/widgets.json`中本组件相关内容，并添加以下内容：
-
-```json
-    {
-        "id": "shao-note",
-        "url": "外部服务器地址",
-        "name": "SHAO-Note",
-        "description": "A note taking widget based on SHAO-Pastebin",
-        "context": [
-            "video"
-        ],
-        "enabled": true
-    }
-```
-
-### 后端安装
-
 请参考[SHAO Pastebin](https://github.com/Futrime/SHAO-Pastebin)中相关内容。
 
 ## 使用教程

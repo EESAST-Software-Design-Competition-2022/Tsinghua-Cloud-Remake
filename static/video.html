@@ -26,13 +26,16 @@
                 <a target="_blank" href="/profile/" class="mx-2">
                     <img class="rounded-circle tcr-avatar">
                 </a>
-                <a href="#" title="视频动态" class="bi-activity mx-2 fs-5 align-baseline link-dark tcr-activity-button" hidden></a>
-                <a href="#" title="收藏夹" class="bi-star mx-2 fs-5 align-baseline link-dark tcr-collection-button" hidden></a>
+                <a href="#" title="视频动态" class="bi-activity mx-2 fs-5 align-baseline link-dark tcr-activity-button"
+                    hidden></a>
+                <a href="#" title="收藏夹" class="bi-star mx-2 fs-5 align-baseline link-dark tcr-collection-button"
+                    hidden></a>
                 <a href="#" title="历史记录"
                     class="bi-clock-history mx-2 fs-5 align-baseline link-dark tcr-history-button"></a>
                 <a href="https://learn.tsinghua.edu.cn/" target="_blank" title="网络学堂"
                     class="bi-book mx-2 fs-5 align-baseline link-dark"></a>
                 <a href="/my-libs/" target="_blank" title="我的资料库" class="bi-hdd mx-2 fs-5 align-baseline link-dark"></a>
+                <a href="#" title="插件设置" class="bi-boxes mx-2 fs-5 align-baseline link-dark tcr-widget-button"></a>
                 <a href="#"
                     class="bi-upload mx-3 px-3 py-1 align-baseline bg-primary rounded-3 text-decoration-none link-light tcr-publish-button"
                     hidden>&nbsp;投稿</a>
@@ -49,15 +52,15 @@
             <div class="tcr-player w-100"></div>
             <div class="tcr-toolbar mt-3">
                 <a href="#" title="点赞" class="tcr-like-button text-decoration-none link-dark me-5" hidden>
-                    <span class="bi-hand-thumbs-up-fill fs-3 me-2 align-middle"></span>
+                    <span class="bi-hand-thumbs-up-fill fs-3 me-2 align-middle tcr-icon"></span>
                     <span class="align-middle tcr-like-count">?</span>
                 </a>
                 <a href="#" title="收藏" class="tcr-collect-button text-decoration-none link-dark me-5" hidden>
-                    <span class="bi-star-fill fs-3 me-2 align-middle"></span>
+                    <span class="bi-star-fill fs-3 me-2 align-middle tcr-icon"></span>
                     <span class="align-middle tcr-collect-count">?</span>
                 </a>
                 <a title="下载" class="tcr-download-button text-decoration-none link-dark me-5">
-                    <span class="bi-file-earmark-arrow-down-fill fs-3 me-2 align-middle"></span>
+                    <span class="bi-file-earmark-arrow-down-fill fs-3 me-2 align-middle tcr-icon"></span>
                     <span class="align-middle tcr-download-count">?</span>
                 </a>
             </div>
@@ -143,6 +146,21 @@
                 </div>
             </div>
             <div class="position-fixed top-0 end-0 p-3 tcr-float-container-top-end">
+                <div class="toast tcr-widget">
+                    <div class="toast-header">
+                        <span class="bi-boxes me-2"></span>
+                        <span class="me-auto">插件设置（刷新生效）</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body overflow-auto tcr-list">
+                        <div class="py-2 mx-auto tcr-unit" data-tcr-widget-id="" hidden>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input tcr-switch" type="checkbox">
+                                <label class="form-check-label tcr-name"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="toast tcr-activity">
                     <div class="toast-header">
                         <span class="bi-activity me-2"></span>
@@ -219,6 +237,11 @@
             <div class="position-fixed bottom-0 end-0 p-3 tcr-float-container-bottom-end"></div>
         </aside>
     </main>
+    <div class="position-fixed top-0 start-0 vh-100 vw-100 bg-opacity-75 bg-light tcr-loading-mask">
+        <div class="h-100 w-100 d-flex">
+            <span class="m-auto spinner-border text-primary"></span>
+        </div>
+    </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.js"></script>
@@ -226,13 +249,16 @@
     <script src="https://cdn.jsdelivr.net/npm/nplayer@1.0.9/dist/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@nplayer/danmaku@1/dist/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
-    <script class="tcr-init">
+    <script class="tcr-init" defer>
         /*
          * Page initialization
          */
         const config = {
             staticURL: document.querySelector('meta[data-tcr-static-url]').getAttribute('data-tcr-static-url'),
-            backendURL: document.querySelector('meta[data-tcr-backend-url]').getAttribute('data-tcr-backend-url')
+            backendURL: document.querySelector('meta[data-tcr-backend-url]').getAttribute('data-tcr-backend-url'),
+            widgetIndex: JSON.parse(
+                document.querySelector('meta[data-tcr-widget-index]').getAttribute('data-tcr-widget-index')
+            )
         };
 
         (() => { // avoid global variables
