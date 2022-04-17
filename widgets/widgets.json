@@ -4,10 +4,23 @@
         "runtime": "async",
         "id": "shao-note",
         "url": "https://tsinghuacloudremake.api.021121.xyz/widgets/shao-note",
-        "name": "SHAO-Note",
+        "name": "SHAO Note",
         "description": "A note taking widget based on SHAO-Pastebin",
         "context": [
             "video"
-        ]
+        ],
+        "dependency": []
+    },
+    {
+        "type": "widget",
+        "runtime": "defer",
+        "id": "speed-1400",
+        "url": "https://tsinghuacloudremake.api.021121.xyz/widgets/speed-1400",
+        "name": "+1400%倍速",
+        "description": "提高视频1400%倍速，提高1400%效率",
+        "context": [
+            "video"
+        ],
+        "dependency": []
     }
 ]
