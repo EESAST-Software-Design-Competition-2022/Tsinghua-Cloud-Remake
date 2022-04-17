@@ -22,5 +22,17 @@
             "video"
         ],
         "dependency": []
+    },
+    {
+        "type": "widget",
+        "runtime": "async",
+        "id": "san-lian",
+        "url": "https://tsinghuacloudremake.api.021121.xyz/widgets/san-lian",
+        "name": "一键三连",
+        "description": "一键三连！",
+        "context": [
+            "video"
+        ],
+        "dependency": []
     }
 ]
